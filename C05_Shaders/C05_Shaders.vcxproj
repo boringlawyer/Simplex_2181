@@ -69,7 +69,7 @@
       <AdditionalDependencies>glu32.lib;glew32.lib;opengl32.lib;sfml-system-d.lib;sfml-window-d.lib;sfml-graphics-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)include\Simplex\Shaders" "$(SolutionDir)_Binary\Shaders" /y</Command>
+      <Command>copy "$(SolutionDir)include\Simplex\Shaders" "$(SolutionDir)_Binary\Shaders"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copying Shaders...</Message>
