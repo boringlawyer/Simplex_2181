@@ -1,7 +1,7 @@
 #version 330
 
 in vec3 Color;
-
+ 
 uniform vec3 SolidColor = vec3(-1,-1,-1);
 uniform bool comp = false;
 out vec4 Fragment;
