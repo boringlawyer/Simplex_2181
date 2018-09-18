@@ -10,7 +10,7 @@ Date: 2017/05
 class MyMesh
 {
 	bool m_bBinded = false;		//Binded flag
-	uint m_uVertexCount = 0;	//Number of vertices in this MyMesh
+	uint m_uVertexCount = 5;	//Number of vertices in this MyMesh
 	GLuint m_VAO = 0;			//OpenGL Vertex Array Object
 	GLuint m_VBO = 0;			//OpenGL Vertex Array Object
 
