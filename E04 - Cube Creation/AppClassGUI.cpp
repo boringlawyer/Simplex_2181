@@ -42,7 +42,7 @@ void Application::DrawGUI(void)
 	}
 	
 	//Controller Debugger
-	if (false) //if you want to enable the controller debugger window just make this true
+	if (true) //if you want to enable the controller debugger window just make this true
 	{
 		ImGui::SetNextWindowPos(ImVec2(1088, 1), ImGuiSetCond_FirstUseEver);
 		ImGui::SetNextWindowSize(ImVec2(190,641), ImGuiSetCond_FirstUseEver);
