@@ -11,7 +11,14 @@ void MyMesh::GenerateCircle(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 		a_nSubdivisions = 3;
 	if (a_nSubdivisions > 360)
 		a_nSubdivisions = 360;
-
+	float angle = 0;
+	float angleDelta = (2 * PI) / a_nSubdivisions;
+	Simplex::vector3 anchor = Simplex::vector3(-1, 0, 0);
+	for (int i = 0; i <= a_nSubdivisions; i++, angle += angleDelta)
+	{
+		AddTri(Simplex::vector3(0, 0, 0), Simplex::vector3(-cos(angle), -sin(angle), 0), anchor);
+		anchor = Simplex::vector3(-cos(angle), -sin(angle), 0);
+	}
 	/*
 		Calculate a_nSubdivisions number of points around a center point in a radial manner
 		then call the AddTri function to generate a_nSubdivision number of faces
