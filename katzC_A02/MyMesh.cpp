@@ -11,6 +11,23 @@ void MyMesh::GenerateCircle(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 		a_nSubdivisions = 3;
 	if (a_nSubdivisions > 360)
 		a_nSubdivisions = 360;
+	float angle = 0;
+	// the change in the angle each time we draw a triangle
+	float angleDelta = (2 * PI) / a_nSubdivisions;
+	// when drawing a triangle, this is the point they share with the last triangle
+	// the default value is for the first triangle only
+	Simplex::vector3 anchor = Simplex::vector3(-a_fRadius, 0, 0);
+	for (int i = 0; i <= a_nSubdivisions; i++, angle += angleDelta)
+	{
+		AddTri(Simplex::vector3(0, 0, 0), Simplex::vector3(-cos(angle) * a_fRadius, -sin(angle) * a_fRadius, 0), anchor);
+		anchor = Simplex::vector3(-cos(angle) * a_fRadius, -sin(angle) * a_fRadius, 0);
+	}
+	// render the other side
+	for (int i = 0; i <= a_nSubdivisions; i++, angle += angleDelta)
+	{
+		AddTri(Simplex::vector3(-cos(angle) * a_fRadius, -sin(angle) * a_fRadius, 0), Simplex::vector3(0, 0, 0), anchor);
+		anchor = Simplex::vector3(-cos(angle) * a_fRadius, -sin(angle) * a_fRadius, 0);
+	}
 
 	/*
 		Calculate a_nSubdivisions number of points around a center point in a radial manner
