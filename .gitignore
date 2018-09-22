@@ -39,3 +39,6 @@ Z_DELETE
 *.db
 .vs/
 _Binary/*_d.ini
+*.lib
+*.lib
+*.dll
