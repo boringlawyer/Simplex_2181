@@ -5,7 +5,7 @@ Date: 2017/05
 #ifndef __MYMESH_H_
 #define __MYMESH_H_
 
-#define USEBASICX
+//#define USEBASICX
 #ifdef USEBASICX
 #include "BasicX\BasicX.h"
 using namespace BasicX;
@@ -117,6 +117,14 @@ public:
 	*/
 	void Render(matrix4 a_mProjection, matrix4 a_mView, matrix4 a_mModel);
 	/*
+	USAGE: Generates a circle mesh
+	ARGUMENTS:
+	-	float a_fRadius: The radius of the circle
+	-	int a_nSubdivisions: How many triangles the circle is composed of
+	-	vector3 a_v3Color: The color of the circle
+	*/
+	void GenerateCircle(float a_fRadius, int a_nSubdivisions, vector3 offset = vector3(0,0,0), vector3 a_v3Color = C_WHITE);
+	/*
 	USAGE: Adds a tri to the list points in the buffer to be compiled
 	//C
 	//| \
@@ -169,7 +177,7 @@ public:
 	-	vector3 a_v3Color -> Color of the mesh
 	OUTPUT: ---
 	*/
-	void GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions, vector3 a_v3Color = C_WHITE);
+	void GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions, vector3 offset, vector3 a_v3Color = C_WHITE);
 	/*
 	USAGE: Generates a cylinder mesh
 	ARGUMENTS:
