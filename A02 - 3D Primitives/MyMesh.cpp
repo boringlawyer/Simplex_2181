@@ -1,9 +1,6 @@
 #include "MyMesh.h"
 void MyMesh::GenerateCircle(float a_fRadius, int a_nSubdivisions, vector3 offset, vector3 a_v3Color)
 {
-	//Release();
-	//Init();
-
 	if (a_fRadius < 0.01f)
 		a_fRadius = 0.01f;
 
@@ -19,24 +16,15 @@ void MyMesh::GenerateCircle(float a_fRadius, int a_nSubdivisions, vector3 offset
 	Simplex::vector3 anchor = Simplex::vector3(-a_fRadius, 0, 0) + offset;
 	for (int i = 0; i <= a_nSubdivisions; i++, angle += angleDelta)
 	{
-		AddTri(offset, Simplex::vector3(-cos(angle) * a_fRadius, -sin(angle) * a_fRadius, 0) + offset, anchor);
-		anchor = Simplex::vector3(-cos(angle) * a_fRadius, -sin(angle) * a_fRadius, 0) + offset;
+		AddTri(offset, Simplex::vector3( -cos(angle) * a_fRadius, 0, -sin(angle) * a_fRadius) + offset, anchor);
+		anchor = Simplex::vector3( -cos(angle) * a_fRadius, 0, -sin(angle) * a_fRadius) + offset;
 	}
 	// render the other side
 	for (int i = 0; i <= a_nSubdivisions; i++, angle += angleDelta)
 	{
-		AddTri(Simplex::vector3(-cos(angle) * a_fRadius, -sin(angle) * a_fRadius, 0) + offset, offset, anchor);
-		anchor = Simplex::vector3(-cos(angle) * a_fRadius, -sin(angle) * a_fRadius, 0) + offset;
+		AddTri(Simplex::vector3(-cos(angle) * a_fRadius, 0, -sin(angle) * a_fRadius) + offset, offset, anchor);
+		anchor = Simplex::vector3(-cos(angle) * a_fRadius, 0, -sin(angle) * a_fRadius) + offset;
 	}
-
-	/*
-		Calculate a_nSubdivisions number of points around a center point in a radial manner
-		then call the AddTri function to generate a_nSubdivision number of faces
-	*/
-
-	// Adding information about color
-	//CompleteMesh(a_v3Color);
-	//CompileOpenGL3X();
 }
 void MyMesh::Init(void)
 {
@@ -316,11 +304,11 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	float angle = 0;
 	// the change in the angle each time we draw a triangle
 	float angleDelta = (2 * PI) / a_nSubdivisions;
-	Simplex::vector3 anchor = Simplex::vector3(-a_fRadius, 0, 0) + offset;
+	Simplex::vector3 anchor = Simplex::vector3(0, a_fHeight, 0) + offset;
 	for (int i = 0; i <= a_nSubdivisions; i++, angle += angleDelta)
 	{
-		AddTri(Simplex::vector3(0, 0, a_fHeight) + offset, Simplex::vector3(-cos(angle) * a_fRadius, -sin(angle) * a_fRadius, 0) + offset, anchor);
-		anchor = Simplex::vector3(-cos(angle) * a_fRadius, -sin(angle) * a_fRadius, 0) + offset;
+		AddTri(vector3(Simplex::vector3(0, a_fHeight, 0) + offset), vector3(-cos(angle) * a_fRadius, 0, -sin(angle) * a_fRadius), anchor);
+		anchor = Simplex::vector3(-cos(angle) * a_fRadius, 0, -sin(angle) * a_fRadius) + offset;
 	}
 	GenerateCircle(a_fRadius, a_nSubdivisions, offset, a_v3Color);
 	// Adding information about color
