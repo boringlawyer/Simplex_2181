@@ -200,6 +200,35 @@ void MyMesh::AddQuad(vector3 a_vBottomLeft, vector3 a_vBottomRight, vector3 a_vT
 	AddVertexPosition(a_vBottomRight);
 	AddVertexPosition(a_vTopRight);
 }
+void MyMesh::AddQuadRing(vector3 a_v3Offset, float a_fHeight, int a_nSubdivisions, float a_fRadius)
+{
+	float angle = 0;
+	float angleDelta = (2 * PI) / a_nSubdivisions;
+	for (int i = 0; i < a_nSubdivisions; ++i)
+	{
+		Simplex::vector3 p1 = Simplex::vector3(-cos(angle) * a_fRadius, 0, -sin(angle) * a_fRadius);
+		Simplex::vector3 p2 = Simplex::vector3(-cos(angle + angleDelta) * a_fRadius, 0, -sin(angle + angleDelta) * a_fRadius);
+		Simplex::vector3 p3 = Simplex::vector3(-cos(angle) * a_fRadius, a_fHeight, -sin(angle) * a_fRadius);
+		Simplex::vector3 p4 = Simplex::vector3(-cos(angle + angleDelta) * a_fRadius, a_fHeight, -sin(angle + angleDelta) * a_fRadius);
+		AddQuad(p1, p2, p3, p4);
+		angle += angleDelta;
+	}
+
+}
+void MyMesh::AddTubeEnd(float a_fInnerRadius, float a_fOuterRadius, float a_fHeight, int a_nSubdivisions)
+{
+	float angle = 0;
+	float angleDelta = (2 * PI) / a_nSubdivisions;
+	float deltaRadius = a_fOuterRadius - a_fInnerRadius;
+	for (int i = 0; i < a_nSubdivisions; ++i, angle += angleDelta)
+	{
+		Simplex::vector3 p1 = Simplex::vector3(-cos(angle) * a_fInnerRadius, a_fHeight, -sin(angle) * a_fInnerRadius);
+		Simplex::vector3 p2 = Simplex::vector3(-cos(angle + angleDelta) * a_fInnerRadius, a_fHeight, -sin(angle + angleDelta) * a_fInnerRadius);
+		Simplex::vector3 p3 = Simplex::vector3(-cos(angle) * a_fOuterRadius, a_fHeight, -sin(angle) * a_fOuterRadius);
+		Simplex::vector3 p4 = Simplex::vector3(-cos(angle + angleDelta) * a_fOuterRadius, a_fHeight, -sin(angle + angleDelta) * a_fOuterRadius);
+		AddQuad(p1, p2, p3, p4);
+	}
+}
 void MyMesh::GenerateCube(float a_fSize, vector3 a_v3Color)
 {
 	if (a_fSize < 0.01f)
@@ -330,55 +359,10 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 
 	Release();
 	Init();
-
-	// Replace this with your code
-	//Mesh* pMesh = new Mesh();
-	//pMesh->GenerateCylinder(a_fRadius, a_fHeight, a_nSubdivisions, a_v3Color);
-	//m_lVertexPos = pMesh->GetVertexList();
-	//m_uVertexCount = m_lVertexPos.size();
-	//SafeDelete(pMesh);
-	float angle = 0;
-	// the change in the angle each time we draw a triangle
-	float angleDelta = (2 * PI) / a_nSubdivisions;
-	// when drawing a triangle, this is the point they share with the last triangle
-	// the default value is for the first triangle only
-	Simplex::vector3 anchor = Simplex::vector3(-a_fRadius, 0, 0);
-	// render the first end
-	for (int i = 0; i <= a_nSubdivisions; i++, angle += angleDelta)
-	{
-		AddTri(Simplex::vector3(0, 0, 0), Simplex::vector3(-cos(angle) * a_fRadius, -sin(angle) * a_fRadius, 0), anchor);
-		anchor = Simplex::vector3(-cos(angle) * a_fRadius, -sin(angle) * a_fRadius, 0);
-	}
-	for (int i = 0; i <= a_nSubdivisions; i++, angle += angleDelta)
-	{
-		AddTri(Simplex::vector3(-cos(angle) * a_fRadius, -sin(angle) * a_fRadius, 0), Simplex::vector3(0, 0, 0), anchor);
-		anchor = Simplex::vector3(-cos(angle) * a_fRadius, -sin(angle) * a_fRadius, 0);
-	}
-	// render the other end
-	anchor = Simplex::vector3(-a_fRadius, 0, a_fHeight);
-	for (int i = 0; i <= a_nSubdivisions; i++, angle += angleDelta)
-	{
-		AddTri(Simplex::vector3(0, 0, a_fHeight), Simplex::vector3(-cos(angle) * a_fRadius, -sin(angle) * a_fRadius, a_fHeight), anchor);
-		anchor = Simplex::vector3(-cos(angle) * a_fRadius, -sin(angle) * a_fRadius, a_fHeight);
-	}
-	for (int i = 0; i <= a_nSubdivisions; i++, angle += angleDelta)
-	{
-		AddTri(Simplex::vector3(-cos(angle) * a_fRadius, -sin(angle) * a_fRadius, a_fHeight), Simplex::vector3(0, 0, a_fHeight), anchor);
-		anchor = Simplex::vector3(-cos(angle) * a_fRadius, -sin(angle) * a_fRadius, a_fHeight);
-	}
+	GenerateCircle(a_fRadius, a_nSubdivisions, vector3(0, 0, 0), a_v3Color);
+	GenerateCircle(a_fRadius, a_nSubdivisions, vector3(0, a_fHeight, 0), a_v3Color);
 	// render the quads
-	for (int i = 0; i < a_nSubdivisions; ++i)
-	{
-		Simplex::vector3 p1 = Simplex::vector3(-cos(angle) * a_fRadius, -sin(angle) * a_fRadius, 0);
-		Simplex::vector3 p2 = Simplex::vector3(-cos(angle + angleDelta) * a_fRadius, -sin(angle + angleDelta) * a_fRadius, 0);
-		Simplex::vector3 p3 = Simplex::vector3(-cos(angle) * a_fRadius, -sin(angle) * a_fRadius, a_fHeight);
-		Simplex::vector3 p4 = Simplex::vector3(-cos(angle + angleDelta) * a_fRadius, -sin(angle + angleDelta) * a_fRadius, a_fHeight);
-		AddQuad(p1, p2, p3, p4);
-		angle += angleDelta;
-	}
-
-	// -------------------------------
-
+	AddQuadRing(vector3(0, 0, 0), a_fHeight, a_nSubdivisions, a_fRadius);
 	// Adding information about color
 	CompleteMesh(a_v3Color);
 	CompileOpenGL3X();
@@ -405,14 +389,10 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 	Release();
 	Init();
 
-	// Replace this with your code
-	Mesh* pMesh = new Mesh();
-	pMesh->GenerateTube(a_fOuterRadius, a_fInnerRadius, a_fHeight, a_nSubdivisions, a_v3Color);
-	m_lVertexPos = pMesh->GetVertexList();
-	m_uVertexCount = m_lVertexPos.size();
-	SafeDelete(pMesh);
-	// -------------------------------
-
+	AddQuadRing(vector3(0, 0, 0), a_fHeight, a_nSubdivisions, a_fInnerRadius);
+	AddQuadRing(vector3(0, 0, 0), a_fHeight, a_nSubdivisions, a_fOuterRadius);
+	AddTubeEnd(a_fInnerRadius, a_fOuterRadius, a_fHeight, a_nSubdivisions);
+	AddTubeEnd(a_fInnerRadius, a_fOuterRadius, 0, a_nSubdivisions);
 	// Adding information about color
 	CompleteMesh(a_v3Color);
 	CompileOpenGL3X();

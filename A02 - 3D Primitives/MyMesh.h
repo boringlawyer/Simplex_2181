@@ -151,6 +151,17 @@ public:
 	OUTPUT: ---
 	*/
 	void AddQuad(vector3 a_vBottomLeft, vector3 a_vBottomRight, vector3 a_vTopLeft, vector3 a_vTopRight);
+	/*
+	USAGE: Generates a ring of quads (useful for cylinders)
+	ARGUMENTS:
+	-	float offset -> where the quad will be generated relative from the origin
+	-	height a_fHeight -> Height of the rings
+	-	int a_nSubdivisions -> Number of quads
+	-	float a_fRadius -> radius of the ring
+	OUTPUT: ---
+	*/
+	void AddQuadRing(vector3 a_v3Offset, float a_fHeight, int a_nSubdivisions, float a_fRadius);
+	void AddTubeEnd(float a_fInnerRadius, float a_fOuterRadius, float a_fHeight, int a_nSubdivisions);
 #pragma region 3D Primitives
 	/*
 	USAGE: Generates a cube
