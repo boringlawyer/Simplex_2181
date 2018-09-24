@@ -536,29 +536,34 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 		Release();
 		Init();
 	}
-	// the radius being used to generate the sphere
-	// the change in current radius with each iteration
-	float deltaRadius = a_fRadius / a_nSubdivisions;
-	float currentRadius = deltaRadius;
-	//GenerateCone(currentRadius, currentRadius, a_nSubdivisions, vector3(0, currentRadius, 0), C_WHITE, false);
-	for (int i = 0; i < 3; ++i, currentRadius += deltaRadius)
+	
+	//Mesh* pMesh = new Mesh();
+	//pMesh->GenerateSphere(a_fRadius, a_nSubdivisions, a_v3Color);
+	//m_lVertexPos = pMesh->GetVertexList();
+	//m_uVertexCount = m_lVertexPos.size();
+	//SafeDelete(pMesh);
+	float* radii = new float[a_nSubdivisions];
+	for (size_t i = 0; i < a_nSubdivisions; ++i)
 	{
-		//if (i == 0)
-		//{
-		//	GenerateCylinder(currentRadius, currentRadius + deltaRadius, currentRadius, a_nSubdivisions, vector3(0, 0, 0), C_WHITE, false);
-		//}
-		//else if (i == 2)
-		//{
-		//	GenerateCylinder(currentRadius, currentRadius + deltaRadius, currentRadius, a_nSubdivisions, vector3(0, -(8), 0), C_WHITE, false);
-		//}
-		//else if (i == 3)
-		//{
-		//	GenerateCylinder(currentRadius, currentRadius + deltaRadius, currentRadius, a_nSubdivisions, vector3(0, 10, 0), C_WHITE, false);
-		//}
-		if (i != 3)
-		GenerateCylinder(currentRadius, currentRadius + deltaRadius, currentRadius, a_nSubdivisions, vector3(0, -(2 * currentRadius + deltaRadius), 0), C_WHITE, false);
-		//GenerateCylinder(currentRadius, currentRadius + deltaRadius, currentRadius, a_nSubdivisions, vector3(0, -(17.5), 0), C_WHITE, false);
+		radii[i] = sqrt(pow(a_fRadius, 2) - pow(i, 2));
+		float test = radii[i];
 	}
+	float deltaRadius = (a_fRadius * 2) / a_nSubdivisions;
+	float currentRadius = 0;
+	for (int i = 0; i < a_nSubdivisions - 1; ++i)
+	{
+		AddQuadRing(vector3(0, i, 0), 1, a_nSubdivisions, radii[i + 1], radii[i]);
+	}
+	for (int i = 0; i < a_nSubdivisions - 2; ++i)
+	{
+		AddQuadRing(vector3(0, -i, 0), 1, a_nSubdivisions, radii[i], radii[i + 1]);
+
+	}
+	/*currentRadius -= deltaRadius;
+	for (int i = a_nSubdivisions / 2; i < a_nSubdivisions; ++i)
+	{
+		AddQuadRing(vector3(0, i, 0), 1, a_nSubdivisions, currentRadius, currentRadius + deltaRadius);
+	}*/
 	// Adding information about color
 	if (compileGL)
 	{
