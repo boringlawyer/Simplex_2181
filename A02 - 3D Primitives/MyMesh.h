@@ -123,7 +123,7 @@ public:
 	-	int a_nSubdivisions: How many triangles the circle is composed of
 	-	vector3 a_v3Color: The color of the circle
 	*/
-	void GenerateCircle(float a_fRadius, int a_nSubdivisions, vector3 offset = vector3(0,0,0), vector3 a_v3Color = C_WHITE);
+	void AddCircle(float a_fRadius, int a_nSubdivisions, vector3 offset = vector3(0,0,0), vector3 a_v3Color = C_WHITE);
 	/*
 	USAGE: Adds a tri to the list points in the buffer to be compiled
 	//C
@@ -161,6 +161,7 @@ public:
 	OUTPUT: ---
 	*/
 	void AddQuadRing(vector3 a_v3Offset, float a_fHeight, int a_nSubdivisions, float a_fRadius);
+	void AddQuadRing(vector3 a_v3Offset, float a_fHeight, int a_nSubdivisions, float a_fTopRadius, float a_fBottomRadius);
 	void AddTubeEnd(float a_fInnerRadius, float a_fOuterRadius, float a_fHeight, int a_nSubdivisions);
 #pragma region 3D Primitives
 	/*
@@ -170,7 +171,7 @@ public:
 	-	vector3 a_v3Color -> Color of the mesh
 	OUTPUT: ---
 	*/
-	void GenerateCube(float a_fSize, vector3 a_v3Color = C_WHITE);
+	void GenerateCube(float a_fSize, vector3 a_v3Color = C_WHITE, bool compileGL = true);
 	/*
 	USAGE: Generates a cuboid
 	ARGUMENTS:
@@ -178,7 +179,7 @@ public:
 	-	vector3 a_v3Color -> Color of the mesh
 	OUTPUT: ---
 	*/
-	void GenerateCuboid(vector3 a_v3Dimensions, vector3 a_v3Color = C_WHITE);
+	void GenerateCuboid(vector3 a_v3Dimensions, vector3 a_v3Color = C_WHITE, bool compileGL = true);
 	/*
 	USAGE: Generates a cone mesh
 	ARGUMENTS:
@@ -188,7 +189,7 @@ public:
 	-	vector3 a_v3Color -> Color of the mesh
 	OUTPUT: ---
 	*/
-	void GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions, vector3 offset, vector3 a_v3Color = C_WHITE);
+	void GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions, vector3 offset, vector3 a_v3Color = C_WHITE, bool compileGL = true);
 	/*
 	USAGE: Generates a cylinder mesh
 	ARGUMENTS:
@@ -198,7 +199,8 @@ public:
 	-	vector3 a_v3Color -> Color of the mesh
 	OUTPUT: ---
 	*/
-	void GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisions, vector3 a_v3Color = C_WHITE);
+	void GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisions, vector3 a_v3Offset, vector3 a_v3Color = C_WHITE, bool compileGL = true);
+	void GenerateCylinder(float a_fTopRadius, float a_fBottomRadius, float a_fHeight, int a_nSubdivisions, vector3 a_v3Offset, vector3 a_v3Color = C_WHITE, bool compileGL = true);
 	/*
 	USAGE: Generates a tube mesh
 	ARGUMENTS:
@@ -209,7 +211,7 @@ public:
 	-	a_v3Color -> Color of the mesh
 	OUTPUT: ---
 	*/
-	void GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fHeight, int a_nSubdivisions, vector3 a_v3Color = C_WHITE);
+	void GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fHeight, int a_nSubdivisions, vector3 a_v3Color = C_WHITE, bool compileGL = true);
 	/*
 	USAGE: Generates a torus mesh
 	ARGUMENTS:
@@ -229,7 +231,7 @@ public:
 	-	a_v3Color -> Color of the mesh
 	OUTPUT: ---
 	*/
-	void GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Color = C_WHITE);
+	void GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Color = C_WHITE, bool compileGL = true);
 #pragma endregion
 };
 

@@ -1,5 +1,5 @@
 #include "MyMesh.h"
-void MyMesh::GenerateCircle(float a_fRadius, int a_nSubdivisions, vector3 offset, vector3 a_v3Color)
+void MyMesh::AddCircle(float a_fRadius, int a_nSubdivisions, vector3 offset, vector3 a_v3Color)
 {
 	if (a_fRadius < 0.01f)
 		a_fRadius = 0.01f;
@@ -199,6 +199,15 @@ void MyMesh::AddQuad(vector3 a_vBottomLeft, vector3 a_vBottomRight, vector3 a_vT
 	AddVertexPosition(a_vTopLeft);
 	AddVertexPosition(a_vBottomRight);
 	AddVertexPosition(a_vTopRight);
+
+	AddVertexPosition(a_vBottomRight);
+	AddVertexPosition(a_vBottomLeft);
+	AddVertexPosition(a_vTopLeft);
+
+	AddVertexPosition(a_vBottomRight);
+	AddVertexPosition(a_vTopLeft);
+	AddVertexPosition(a_vTopRight);
+
 }
 void MyMesh::AddQuadRing(vector3 a_v3Offset, float a_fHeight, int a_nSubdivisions, float a_fRadius)
 {
@@ -206,14 +215,28 @@ void MyMesh::AddQuadRing(vector3 a_v3Offset, float a_fHeight, int a_nSubdivision
 	float angleDelta = (2 * PI) / a_nSubdivisions;
 	for (int i = 0; i < a_nSubdivisions; ++i)
 	{
-		Simplex::vector3 p1 = Simplex::vector3(-cos(angle) * a_fRadius, 0, -sin(angle) * a_fRadius);
-		Simplex::vector3 p2 = Simplex::vector3(-cos(angle + angleDelta) * a_fRadius, 0, -sin(angle + angleDelta) * a_fRadius);
-		Simplex::vector3 p3 = Simplex::vector3(-cos(angle) * a_fRadius, a_fHeight, -sin(angle) * a_fRadius);
-		Simplex::vector3 p4 = Simplex::vector3(-cos(angle + angleDelta) * a_fRadius, a_fHeight, -sin(angle + angleDelta) * a_fRadius);
+		Simplex::vector3 p1 = Simplex::vector3(-cos(angle) * a_fRadius, 0, -sin(angle) * a_fRadius) + a_v3Offset;
+		Simplex::vector3 p2 = Simplex::vector3(-cos(angle + angleDelta) * a_fRadius, 0, -sin(angle + angleDelta) * a_fRadius) + a_v3Offset;
+		Simplex::vector3 p3 = Simplex::vector3(-cos(angle) * a_fRadius, a_fHeight, -sin(angle) * a_fRadius) + a_v3Offset;
+		Simplex::vector3 p4 = Simplex::vector3(-cos(angle + angleDelta) * a_fRadius, a_fHeight, -sin(angle + angleDelta) * a_fRadius) + a_v3Offset;
 		AddQuad(p1, p2, p3, p4);
 		angle += angleDelta;
 	}
 
+}
+void MyMesh::AddQuadRing(vector3 a_v3Offset, float a_fHeight, int a_nSubdivisions, float a_fTopRadius, float a_fBottomRadius)
+{
+	float angle = 0;
+	float angleDelta = (2 * PI) / a_nSubdivisions;
+	for (int i = 0; i < a_nSubdivisions; ++i)
+	{
+		Simplex::vector3 p1 = Simplex::vector3(-cos(angle) * a_fBottomRadius, 0, -sin(angle) * a_fBottomRadius) + a_v3Offset;
+		Simplex::vector3 p2 = Simplex::vector3(-cos(angle + angleDelta) * a_fBottomRadius, 0, -sin(angle + angleDelta) * a_fBottomRadius) + a_v3Offset;
+		Simplex::vector3 p3 = Simplex::vector3(-cos(angle) * a_fTopRadius, a_fHeight, -sin(angle) * a_fTopRadius) + a_v3Offset;
+		Simplex::vector3 p4 = Simplex::vector3(-cos(angle + angleDelta) * a_fTopRadius, a_fHeight, -sin(angle + angleDelta) * a_fTopRadius) + a_v3Offset;
+		AddQuad(p1, p2, p3, p4);
+		angle += angleDelta;
+	}
 }
 void MyMesh::AddTubeEnd(float a_fInnerRadius, float a_fOuterRadius, float a_fHeight, int a_nSubdivisions)
 {
@@ -229,14 +252,16 @@ void MyMesh::AddTubeEnd(float a_fInnerRadius, float a_fOuterRadius, float a_fHei
 		AddQuad(p1, p2, p3, p4);
 	}
 }
-void MyMesh::GenerateCube(float a_fSize, vector3 a_v3Color)
+void MyMesh::GenerateCube(float a_fSize, vector3 a_v3Color, bool compileGL)
 {
 	if (a_fSize < 0.01f)
 		a_fSize = 0.01f;
-
-	Release();
-	Init();
-
+	if (compileGL)
+	{
+		Release();
+		Init();
+	}
+	
 	float fValue = a_fSize * 0.5f;
 	//3--2
 	//|  |
@@ -270,14 +295,20 @@ void MyMesh::GenerateCube(float a_fSize, vector3 a_v3Color)
 	//D
 	AddQuad(point4, point5, point0, point1);
 
-	// Adding information about color
-	CompleteMesh(a_v3Color);
-	CompileOpenGL3X();
+	if (compileGL)
+	{
+		// Adding information about color
+		CompleteMesh(a_v3Color);
+		CompileOpenGL3X();
+	}
 }
-void MyMesh::GenerateCuboid(vector3 a_v3Dimensions, vector3 a_v3Color)
+void MyMesh::GenerateCuboid(vector3 a_v3Dimensions, vector3 a_v3Color, bool compileGL)
 {
-	Release();
-	Init();
+	if (compileGL)
+	{
+		Release();
+		Init();
+	}
 
 	vector3 v3Value = a_v3Dimensions * 0.5f;
 	//3--2
@@ -311,12 +342,15 @@ void MyMesh::GenerateCuboid(vector3 a_v3Dimensions, vector3 a_v3Color)
 	//D
 	AddQuad(point4, point5, point0, point1);
 
-	// Adding information about color
-	CompleteMesh(a_v3Color);
-	CompileOpenGL3X();
+	if (compileGL)
+	{
+		// Adding information about color
+		CompleteMesh(a_v3Color);
+		CompileOpenGL3X();
+	}
 }
 
-void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions, vector3 offset, vector3 a_v3Color)
+void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions, vector3 offset, vector3 a_v3Color, bool compileGL)
 {
 	if (a_fRadius < 0.01f)
 		a_fRadius = 0.01f;
@@ -328,23 +362,29 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 		a_nSubdivisions = 3;
 	if (a_nSubdivisions > 360)
 		a_nSubdivisions = 360;
-	Release();
-	Init();
+	if (compileGL)
+	{
+		Release();
+		Init();
+	}
 	float angle = 0;
 	// the change in the angle each time we draw a triangle
 	float angleDelta = (2 * PI) / a_nSubdivisions;
 	Simplex::vector3 anchor = Simplex::vector3(0, a_fHeight, 0) + offset;
 	for (int i = 0; i <= a_nSubdivisions; i++, angle += angleDelta)
 	{
-		AddTri(vector3(Simplex::vector3(0, a_fHeight, 0) + offset), vector3(-cos(angle) * a_fRadius, 0, -sin(angle) * a_fRadius), anchor);
+		AddTri(vector3(Simplex::vector3(0, a_fHeight, 0) + offset), vector3(-cos(angle) * a_fRadius, 0, -sin(angle) * a_fRadius) + offset, anchor);
 		anchor = Simplex::vector3(-cos(angle) * a_fRadius, 0, -sin(angle) * a_fRadius) + offset;
 	}
-	GenerateCircle(a_fRadius, a_nSubdivisions, offset, a_v3Color);
-	// Adding information about color
-	CompleteMesh(a_v3Color);
-	CompileOpenGL3X();
+	AddCircle(a_fRadius, a_nSubdivisions, offset, a_v3Color);
+	if (compileGL)
+	{
+		// Adding information about color
+		CompleteMesh(a_v3Color);
+		CompileOpenGL3X();
+	}
 }
-void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisions, vector3 a_v3Color)
+void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisions, vector3 a_v3Offset, vector3 a_v3Color, bool compileGL)
 {
 	if (a_fRadius < 0.01f)
 		a_fRadius = 0.01f;
@@ -357,17 +397,55 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	if (a_nSubdivisions > 360)
 		a_nSubdivisions = 360;
 
-	Release();
-	Init();
-	GenerateCircle(a_fRadius, a_nSubdivisions, vector3(0, 0, 0), a_v3Color);
-	GenerateCircle(a_fRadius, a_nSubdivisions, vector3(0, a_fHeight, 0), a_v3Color);
+	if (compileGL)
+	{
+		Release();
+		Init();
+	}
+	AddCircle(a_fRadius, a_nSubdivisions, vector3(0, 0, 0) + a_v3Offset, a_v3Color);
+	AddCircle(a_fRadius, a_nSubdivisions, vector3(0, a_fHeight, 0) + a_v3Offset, a_v3Color);
 	// render the quads
-	AddQuadRing(vector3(0, 0, 0), a_fHeight, a_nSubdivisions, a_fRadius);
-	// Adding information about color
-	CompleteMesh(a_v3Color);
-	CompileOpenGL3X();
+	AddQuadRing(a_v3Offset, a_fHeight, a_nSubdivisions, a_fRadius);
+	if (compileGL)
+	{
+		// Adding information about color
+		CompleteMesh(a_v3Color);
+		CompileOpenGL3X();
+	}
 }
-void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fHeight, int a_nSubdivisions, vector3 a_v3Color)
+void MyMesh::GenerateCylinder(float a_fTopRadius, float a_fBottomRadius, float a_fHeight, int a_nSubdivisions, vector3 a_v3Offset, vector3 a_v3Color, bool compileGL)
+{
+	if (a_fTopRadius < 0.01f)
+		a_fTopRadius = 0.01f;
+
+	if (a_fBottomRadius < 0.005f)
+		a_fBottomRadius = 0.005f;
+
+	if (a_fHeight < 0.01f)
+		a_fHeight = 0.01f;
+
+	if (a_nSubdivisions < 3)
+		a_nSubdivisions = 3;
+	if (a_nSubdivisions > 360)
+		a_nSubdivisions = 360;
+
+	if (compileGL)
+	{
+		Release();
+		Init();
+	}
+
+	AddCircle(a_fTopRadius, a_nSubdivisions, vector3(0, a_fHeight, 0) + a_v3Offset, a_v3Color);
+	AddCircle(a_fBottomRadius, a_nSubdivisions, vector3(0, 0, 0) + a_v3Offset, a_v3Color);
+	AddQuadRing(a_v3Offset, a_fHeight, a_nSubdivisions, a_fTopRadius, a_fBottomRadius);
+	if (compileGL)
+	{
+		// Adding information about color
+		CompleteMesh(a_v3Color);
+		CompileOpenGL3X();
+	}
+}
+void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fHeight, int a_nSubdivisions, vector3 a_v3Color, bool compileGL)
 {
 	if (a_fOuterRadius < 0.01f)
 		a_fOuterRadius = 0.01f;
@@ -386,16 +464,22 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 	if (a_nSubdivisions > 360)
 		a_nSubdivisions = 360;
 
-	Release();
-	Init();
+	if (compileGL)
+	{
+		Release();
+		Init();
+	}
 
 	AddQuadRing(vector3(0, 0, 0), a_fHeight, a_nSubdivisions, a_fInnerRadius);
 	AddQuadRing(vector3(0, 0, 0), a_fHeight, a_nSubdivisions, a_fOuterRadius);
 	AddTubeEnd(a_fInnerRadius, a_fOuterRadius, a_fHeight, a_nSubdivisions);
 	AddTubeEnd(a_fInnerRadius, a_fOuterRadius, 0, a_nSubdivisions);
-	// Adding information about color
-	CompleteMesh(a_v3Color);
-	CompileOpenGL3X();
+	if (compileGL)
+	{
+		// Adding information about color
+		CompleteMesh(a_v3Color);
+		CompileOpenGL3X();
+	}
 }
 void MyMesh::GenerateTorus(float a_fOuterRadius, float a_fInnerRadius, int a_nSubdivisionsA, int a_nSubdivisionsB, vector3 a_v3Color)
 {
@@ -433,7 +517,7 @@ void MyMesh::GenerateTorus(float a_fOuterRadius, float a_fInnerRadius, int a_nSu
 	CompleteMesh(a_v3Color);
 	CompileOpenGL3X();
 }
-void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Color)
+void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Color, bool compileGL)
 {
 	if (a_fRadius < 0.01f)
 		a_fRadius = 0.01f;
@@ -447,32 +531,38 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 	if (a_nSubdivisions > 6)
 		a_nSubdivisions = 6;
 
-	Release();
-	Init();
-	// the distance between divisions
-	float deltaDivision = (a_fRadius * 2) / a_nSubdivisions;
-	// current width of the circle being rendered
-	float currentWidth = -a_fRadius;
-	// the difference between the radii of consecutive circles in the sphere
-	float deltaRadius = a_fRadius / a_nSubdivisions;
-	// the radius of the current circle
-	float currentRadius = deltaRadius;
-	AddVertexPosition(Simplex::vector3(0, -a_fRadius, 0));
-	for (int i = 0; i < a_nSubdivisions; i++)
+	if (compileGL)
 	{
-		float angle = 0;
-		// the change in the angle each time we draw a triangle
-		float angleDelta = (2 * PI) / a_nSubdivisions;
-		// when drawing a triangle, this is the point they share with the last triangle
-		// the default value is for the first triangle only
-		Simplex::vector3 anchor = Simplex::vector3(-currentRadius, 0, 0);
-		for (int i = 0; i <= a_nSubdivisions; i++, angle += angleDelta)
-		{
-			AddTri(Simplex::vector3(0, 0, 0), Simplex::vector3(-cos(angle) * currentRadius, -sin(angle) * currentRadius, 0), anchor);
-			anchor = Simplex::vector3(-cos(angle) * currentRadius, -sin(angle) * currentRadius, 0);
-		}
+		Release();
+		Init();
+	}
+	// the radius being used to generate the sphere
+	// the change in current radius with each iteration
+	float deltaRadius = a_fRadius / a_nSubdivisions;
+	float currentRadius = deltaRadius;
+	//GenerateCone(currentRadius, currentRadius, a_nSubdivisions, vector3(0, currentRadius, 0), C_WHITE, false);
+	for (int i = 0; i < 3; ++i, currentRadius += deltaRadius)
+	{
+		//if (i == 0)
+		//{
+		//	GenerateCylinder(currentRadius, currentRadius + deltaRadius, currentRadius, a_nSubdivisions, vector3(0, 0, 0), C_WHITE, false);
+		//}
+		//else if (i == 2)
+		//{
+		//	GenerateCylinder(currentRadius, currentRadius + deltaRadius, currentRadius, a_nSubdivisions, vector3(0, -(8), 0), C_WHITE, false);
+		//}
+		//else if (i == 3)
+		//{
+		//	GenerateCylinder(currentRadius, currentRadius + deltaRadius, currentRadius, a_nSubdivisions, vector3(0, 10, 0), C_WHITE, false);
+		//}
+		if (i != 3)
+		GenerateCylinder(currentRadius, currentRadius + deltaRadius, currentRadius, a_nSubdivisions, vector3(0, -(2 * currentRadius + deltaRadius), 0), C_WHITE, false);
+		//GenerateCylinder(currentRadius, currentRadius + deltaRadius, currentRadius, a_nSubdivisions, vector3(0, -(17.5), 0), C_WHITE, false);
 	}
 	// Adding information about color
-	CompleteMesh(a_v3Color);
-	CompileOpenGL3X();
+	if (compileGL)
+	{
+		CompleteMesh(a_v3Color);
+		CompileOpenGL3X();
+	}
 }
