@@ -469,9 +469,10 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 		Release();
 		Init();
 	}
-
+	// add the inner and outer rings of quads
 	AddQuadRing(vector3(0, 0, 0), a_fHeight, a_nSubdivisions, a_fInnerRadius);
 	AddQuadRing(vector3(0, 0, 0), a_fHeight, a_nSubdivisions, a_fOuterRadius);
+	// close the shape with the tube ends
 	AddTubeEnd(a_fInnerRadius, a_fOuterRadius, a_fHeight, a_nSubdivisions);
 	AddTubeEnd(a_fInnerRadius, a_fOuterRadius, 0, a_nSubdivisions);
 	if (compileGL)
@@ -529,7 +530,7 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 		return;
 	}
 	if (a_nSubdivisions > 6)
-		a_nSubdivisions = 6;
+		//a_nSubdivisions = 6;
 
 	if (compileGL)
 	{
@@ -542,32 +543,30 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 	//m_lVertexPos = pMesh->GetVertexList();
 	//m_uVertexCount = m_lVertexPos.size();
 	//SafeDelete(pMesh);
+	// I will generate the sphere geometry based on circles stacked upon one another,
+	// with them having smaller radii at the ends of the sphere and bigger radii toward
+	// the equator. float* radii will store the radii of the imaginary circles,
+	// heightDelta will be the difference in height between consecutive circles
 	float* radii = new float[a_nSubdivisions];
+	float heightDelta = ((a_fRadius) / (a_nSubdivisions));
 	for (size_t i = 0; i < a_nSubdivisions; ++i)
 	{
-		radii[i] = sqrt(pow(a_fRadius, 2) - pow(i, 2));
+		radii[i] = sqrt(pow(a_fRadius, 2) - pow(i * heightDelta, 2));
 		float test = radii[i];
 	}
-	float deltaRadius = (a_fRadius * 2) / a_nSubdivisions;
-	float currentRadius = 0;
 	for (int i = 0; i < a_nSubdivisions - 1; ++i)
 	{
-		AddQuadRing(vector3(0, i, 0), 1, a_nSubdivisions, radii[i + 1], radii[i]);
+		AddQuadRing(vector3(0, i * heightDelta, 0), heightDelta, a_nSubdivisions, radii[i + 1], radii[i]);
 	}
-	for (int i = 0; i < a_nSubdivisions - 2; ++i)
+	for (int i = 0; i < a_nSubdivisions - 1; ++i)
 	{
-		AddQuadRing(vector3(0, -i, 0), 1, a_nSubdivisions, radii[i], radii[i + 1]);
-
+		AddQuadRing(vector3(0, -i * heightDelta - heightDelta, 0), heightDelta, a_nSubdivisions, radii[i], radii[i + 1]);
 	}
-	/*currentRadius -= deltaRadius;
-	for (int i = a_nSubdivisions / 2; i < a_nSubdivisions; ++i)
-	{
-		AddQuadRing(vector3(0, i, 0), 1, a_nSubdivisions, currentRadius, currentRadius + deltaRadius);
-	}*/
 	// Adding information about color
 	if (compileGL)
 	{
 		CompleteMesh(a_v3Color);
 		CompileOpenGL3X();
 	}
+	delete radii;
 }
