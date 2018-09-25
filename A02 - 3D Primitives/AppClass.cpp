@@ -4,7 +4,7 @@ void Application::InitVariables(void)
 	//Make MyMesh object
 	m_pMesh = new MyMesh();
 	//Generate a circle
-	m_pMesh->GenerateSphere(6, 10);
+	m_pMesh->GenerateSphere(1, 50);
 }
 void Application::Update(void)
 {

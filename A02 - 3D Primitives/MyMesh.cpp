@@ -356,7 +356,7 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 		a_fRadius = 0.01f;
 
 	if (a_fHeight < 0.01f)
-		a_fHeight = 0.01f;
+		//a_fHeight = 0.01f;
 
 	if (a_nSubdivisions < 3)
 		a_nSubdivisions = 3;
@@ -374,6 +374,8 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	for (int i = 0; i <= a_nSubdivisions; i++, angle += angleDelta)
 	{
 		AddTri(vector3(Simplex::vector3(0, a_fHeight, 0) + offset), vector3(-cos(angle) * a_fRadius, 0, -sin(angle) * a_fRadius) + offset, anchor);
+		// have the triangle render on both sides
+		AddTri(vector3(-cos(angle) * a_fRadius, 0, -sin(angle) * a_fRadius) + offset, vector3(Simplex::vector3(0, a_fHeight, 0) + offset), anchor);
 		anchor = Simplex::vector3(-cos(angle) * a_fRadius, 0, -sin(angle) * a_fRadius) + offset;
 	}
 	AddCircle(a_fRadius, a_nSubdivisions, offset, a_v3Color);
@@ -554,14 +556,18 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 		radii[i] = sqrt(pow(a_fRadius, 2) - pow(i * heightDelta, 2));
 		float test = radii[i];
 	}
-	for (int i = 0; i < a_nSubdivisions - 1; ++i)
+	int i;
+	for (i = 0; i < a_nSubdivisions - 1; ++i)
 	{
 		AddQuadRing(vector3(0, i * heightDelta, 0), heightDelta, a_nSubdivisions, radii[i + 1], radii[i]);
 	}
-	for (int i = 0; i < a_nSubdivisions - 1; ++i)
+	for (i = 0; i < a_nSubdivisions - 1; ++i)
 	{
 		AddQuadRing(vector3(0, -i * heightDelta - heightDelta, 0), heightDelta, a_nSubdivisions, radii[i], radii[i + 1]);
 	}
+	// add the top and bottom cones
+	GenerateCone(radii[i], heightDelta, a_nSubdivisions, vector3(0, a_fRadius - heightDelta, 0), vector3(1, 1, 1), false);
+	GenerateCone(radii[i], -heightDelta, a_nSubdivisions, vector3(0, -(a_fRadius - heightDelta), 0), a_v3Color, false);
 	// Adding information about color
 	if (compileGL)
 	{
