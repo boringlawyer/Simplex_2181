@@ -115,7 +115,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "A05 - SAT", "A05 - SAT\A05 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "A06 - Octree", "A06 - Octree\A06 - Octree.vcxproj", "{44D2C07B-798D-461B-9019-DFB240593888}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "E05", "E05\E05.vcxproj", "{38664A13-5C7E-4FCA-8184-297CB4508061}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "E05", "katzC_E05\E05.vcxproj", "{38664A13-5C7E-4FCA-8184-297CB4508061}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

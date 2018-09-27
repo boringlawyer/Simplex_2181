@@ -3,8 +3,7 @@ void Application::InitVariables(void)
 {
 	//Make MyMesh object
 	m_pMesh = new MyMesh();
-	//Generate a circle
-	m_pMesh->GenerateTube(5, 7, 5, 20, C_RED);
+	m_pMesh->GenerateTube(7, 2, 7, 10);
 }
 void Application::Update(void)
 {

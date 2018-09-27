@@ -5,6 +5,7 @@ void Application::InitVariables(void)
 	m_pMesh = new MyMesh();
 	//m_pMesh->GenerateCube(1.0f, C_WHITE);
 	m_pMesh->GenerateSphere(1.0f, 5, C_WHITE);
+	// attay of boxes that make up model
 	invader = new MyMesh[46];
 	for (int i = 0; i < 46; ++i)
 	{
@@ -87,6 +88,7 @@ void Application::Display(void)
 
 	m_pMesh->Render(m4Projection, m4View, m4Model);
 	
+	// not only moves each box, but offsets them so the form the model
 	for (int i = 0; i < 46; ++i)
 	{
 		m4Translate = glm::translate(IDENTITY_M4, vector3(value, 2.0f, 3.0f) + invaderPositions[i]);

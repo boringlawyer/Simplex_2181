@@ -200,7 +200,7 @@ public:
 	OUTPUT: ---
 	*/
 	void GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisions, vector3 a_v3Offset, vector3 a_v3Color = C_WHITE, bool compileGL = true);
-	void GenerateCylinder(float a_fTopRadius, float a_fBottomRadius, float a_fHeight, int a_nSubdivisions, vector3 a_v3Offset, vector3 a_v3Color = C_WHITE, bool compileGL = true);
+	//void GenerateCylinder(float a_fTopRadius, float a_fBottomRadius, float a_fHeight, int a_nSubdivisions, vector3 a_v3Offset, vector3 a_v3Color = C_WHITE, bool compileGL = true);
 	/*
 	USAGE: Generates a tube mesh
 	ARGUMENTS:

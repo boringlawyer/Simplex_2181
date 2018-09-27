@@ -209,6 +209,8 @@ void MyMesh::AddQuad(vector3 a_vBottomLeft, vector3 a_vBottomRight, vector3 a_vT
 	AddVertexPosition(a_vTopRight);
 
 }
+
+// creates a ring of quads. Used in cylinder generation
 void MyMesh::AddQuadRing(vector3 a_v3Offset, float a_fHeight, int a_nSubdivisions, float a_fRadius)
 {
 	float angle = 0;
@@ -224,6 +226,7 @@ void MyMesh::AddQuadRing(vector3 a_v3Offset, float a_fHeight, int a_nSubdivision
 	}
 
 }
+// creates a ring of quads that can have different top and bottom radii. Used for spheres
 void MyMesh::AddQuadRing(vector3 a_v3Offset, float a_fHeight, int a_nSubdivisions, float a_fTopRadius, float a_fBottomRadius)
 {
 	float angle = 0;
@@ -238,6 +241,8 @@ void MyMesh::AddQuadRing(vector3 a_v3Offset, float a_fHeight, int a_nSubdivision
 		angle += angleDelta;
 	}
 }
+
+// used to add the top and bottom ends of the tubes
 void MyMesh::AddTubeEnd(float a_fInnerRadius, float a_fOuterRadius, float a_fHeight, int a_nSubdivisions)
 {
 	float angle = 0;
@@ -355,7 +360,8 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	if (a_fRadius < 0.01f)
 		a_fRadius = 0.01f;
 
-	if (a_fHeight < 0.01f)
+	// commented out to allow for upside down cones (see GenerateSphere)
+	//if (a_fHeight < 0.01f)
 		//a_fHeight = 0.01f;
 
 	if (a_nSubdivisions < 3)
@@ -370,6 +376,8 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	float angle = 0;
 	// the change in the angle each time we draw a triangle
 	float angleDelta = (2 * PI) / a_nSubdivisions;
+	// Each triangle shares a point with the triangle that came before it,
+	// which will be stored in anchor
 	Simplex::vector3 anchor = Simplex::vector3(0, a_fHeight, 0) + offset;
 	for (int i = 0; i <= a_nSubdivisions; i++, angle += angleDelta)
 	{
@@ -415,38 +423,38 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 		CompileOpenGL3X();
 	}
 }
-void MyMesh::GenerateCylinder(float a_fTopRadius, float a_fBottomRadius, float a_fHeight, int a_nSubdivisions, vector3 a_v3Offset, vector3 a_v3Color, bool compileGL)
-{
-	if (a_fTopRadius < 0.01f)
-		a_fTopRadius = 0.01f;
-
-	if (a_fBottomRadius < 0.005f)
-		a_fBottomRadius = 0.005f;
-
-	if (a_fHeight < 0.01f)
-		a_fHeight = 0.01f;
-
-	if (a_nSubdivisions < 3)
-		a_nSubdivisions = 3;
-	if (a_nSubdivisions > 360)
-		a_nSubdivisions = 360;
-
-	if (compileGL)
-	{
-		Release();
-		Init();
-	}
-
-	AddCircle(a_fTopRadius, a_nSubdivisions, vector3(0, a_fHeight, 0) + a_v3Offset, a_v3Color);
-	AddCircle(a_fBottomRadius, a_nSubdivisions, vector3(0, 0, 0) + a_v3Offset, a_v3Color);
-	AddQuadRing(a_v3Offset, a_fHeight, a_nSubdivisions, a_fTopRadius, a_fBottomRadius);
-	if (compileGL)
-	{
-		// Adding information about color
-		CompleteMesh(a_v3Color);
-		CompileOpenGL3X();
-	}
-}
+//void MyMesh::GenerateCylinder(float a_fTopRadius, float a_fBottomRadius, float a_fHeight, int a_nSubdivisions, vector3 a_v3Offset, vector3 a_v3Color, bool compileGL)
+//{
+//	if (a_fTopRadius < 0.01f)
+//		a_fTopRadius = 0.01f;
+//
+//	if (a_fBottomRadius < 0.005f)
+//		a_fBottomRadius = 0.005f;
+//
+//	if (a_fHeight < 0.01f)
+//		a_fHeight = 0.01f;
+//
+//	if (a_nSubdivisions < 3)
+//		a_nSubdivisions = 3;
+//	if (a_nSubdivisions > 360)
+//		a_nSubdivisions = 360;
+//
+//	if (compileGL)
+//	{
+//		Release();
+//		Init();
+//	}
+//
+//	AddCircle(a_fTopRadius, a_nSubdivisions, vector3(0, a_fHeight, 0) + a_v3Offset, a_v3Color);
+//	AddCircle(a_fBottomRadius, a_nSubdivisions, vector3(0, 0, 0) + a_v3Offset, a_v3Color);
+//	AddQuadRing(a_v3Offset, a_fHeight, a_nSubdivisions, a_fTopRadius, a_fBottomRadius);
+//	if (compileGL)
+//	{
+//		// Adding information about color
+//		CompleteMesh(a_v3Color);
+//		CompileOpenGL3X();
+//	}
+//}
 void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fHeight, int a_nSubdivisions, vector3 a_v3Color, bool compileGL)
 {
 	if (a_fOuterRadius < 0.01f)
