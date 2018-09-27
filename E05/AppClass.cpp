@@ -111,7 +111,7 @@ void Application::Display(void)
 void Application::Release(void)
 {
 	SafeDelete(m_pMesh);
-
+	delete invader;
 	//release GUI
 	ShutdownGUI();
 }
