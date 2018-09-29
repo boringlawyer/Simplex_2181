@@ -43,3 +43,4 @@ _Binary/*_d.ini
 *.lib
 *.dll
 *.exe
+*.ini
