@@ -67,7 +67,7 @@ void Application::Display(void)
 	if (glm::distance(v3CurrentPos, m_stopsList[stopIndex + 1]) < .1)
 	{
 		// if the last stop has been reached, start from the first stop. Otherwise, increment
-		// stopIndex by 1
+		// stopIndex by 1 
 		++stopIndex;
 		if (stopIndex == m_stopsList.size() - 1)
 		{
