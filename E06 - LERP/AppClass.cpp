@@ -26,6 +26,8 @@ void Application::InitVariables(void)
 	m_stopsList.push_back(vector3(5.0f, 2.0f, -5.0f));
 
 	m_stopsList.push_back(vector3(1.0f, 3.0f, -5.0f));
+	// added the first entry again for a smooth circuit
+	m_stopsList.push_back(vector3(-4.0f, -2.0f, 5.0f));
 }
 void Application::Update(void)
 {
@@ -59,7 +61,20 @@ void Application::Display(void)
 
 
 	//your code goes here
-	v3CurrentPos = vector3(0.0f, 0.0f, 0.0f);
+	static int stopIndex = 0;
+	v3CurrentPos = glm::lerp(m_stopsList[stopIndex], m_stopsList[stopIndex + 1], fTimer);
+	// if the currentPosition is close enough to its position, move on to the next stop
+	if (glm::distance(v3CurrentPos, m_stopsList[stopIndex + 1]) < .1)
+	{
+		// if the last stop has been reached, start from the first stop. Otherwise, increment
+		// stopIndex by 1 
+		++stopIndex;
+		if (stopIndex == m_stopsList.size() - 1)
+		{
+			stopIndex = 0;
+		}
+		fTimer = 0;
+	}
 	//-------------------
 	
 
