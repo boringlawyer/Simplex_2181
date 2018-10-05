@@ -2,7 +2,7 @@
 void Application::InitVariables(void)
 {
 	//Change this to your name and email
-	m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
+	m_sProgrammer = "Caleb Katzenstein - cnk5777@rit.edu";
 	
 	//Set the position and target of the camera
 	//(I'm at [0,0,10], looking at [0,0,0] and up is the positive Y axis)
@@ -31,6 +31,24 @@ void Application::InitVariables(void)
 	/*
 		This part will create the orbits, it start at 3 because that is the minimum subdivisions a torus can have
 	*/
+	vector3** stopsList = new vector3*[m_uOrbits];
+	// the angle used to make the stop
+	float angle = 0;
+	// the change in the angle each iteration of the second loop
+	float angleDelta = 0;
+	for (int i = 0; i < m_uOrbits; ++i)
+	{
+		for (int j = 3; j < m_uOrbits + 3; ++j)
+		{
+			stopsList[i] = new vector3[j];
+			angleDelta = (2 * PI) / j;
+			for (int k = 0; k < 3; ++k, angle += angleDelta)
+			{
+
+			}
+		}
+	}
+	
 	uint uSides = 3; //start with the minimal 3 sides
 	for (uint i = uSides; i < m_uOrbits + uSides; i++)
 	{
@@ -70,7 +88,7 @@ void Application::Display(void)
 		m_pMeshMngr->AddMeshToRenderList(m_shapeList[i], glm::rotate(m4Offset, 1.5708f, AXIS_X));
 
 		//calculate the current position
-		vector3 v3CurrentPos = ZERO_V3;
+		vector3 v3CurrentPos = vector3(i * .5f + 1, 0, 0);
 		matrix4 m4Model = glm::translate(m4Offset, v3CurrentPos);
 
 		//draw spheres
