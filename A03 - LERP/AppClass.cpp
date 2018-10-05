@@ -1,4 +1,5 @@
 #include "AppClass.h"
+
 void Application::InitVariables(void)
 {
 	//Change this to your name and email
@@ -31,21 +32,19 @@ void Application::InitVariables(void)
 	/*
 		This part will create the orbits, it start at 3 because that is the minimum subdivisions a torus can have
 	*/
-	vector3** stopsList = new vector3*[m_uOrbits];
+	stopsList = new vector3*[m_uOrbits];
 	// the angle used to make the stop
 	float angle = 0;
 	// the change in the angle each iteration of the second loop
 	float angleDelta = 0;
-	for (int i = 0; i < m_uOrbits; ++i)
+	for (int i = 0, j = 3; i < m_uOrbits; ++i, ++j)
 	{
-		for (int j = 3; j < m_uOrbits + 3; ++j)
+		stopsList[i] = new vector3[j];
+		angleDelta = (2 * PI) / j;
+		for (int k = 0; k < j; k++, angle += angleDelta)
 		{
-			stopsList[i] = new vector3[j];
-			angleDelta = (2 * PI) / j;
-			for (int k = 0; k < 3; ++k, angle += angleDelta)
-			{
-
-			}
+			vector3 debug = vector3(cos(angle), sin(angle), 0);
+			stopsList[i][k] = vector3(cos(angle), sin(angle), 0) * ((i + 1) * .1f);
 		}
 	}
 	
@@ -82,13 +81,27 @@ void Application::Display(void)
 	*/
 	//m4Offset = glm::rotate(IDENTITY_M4, 1.5708f, AXIS_Z);
 
+	//Get a timer
+	static float fTimer = 0;	//store the new timer
+	static uint uClock = m_pSystem->GenClock(); //generate a new clock for that timer
+	fTimer += m_pSystem->GetDeltaTime(uClock); //get the delta time for that timer
+
+	// indirectly measures what point a sphere is interpolating towards
+	static int stopIndex = 0;
+	// if two seconds pass, reset timer and increment stopIndex
+	if (fTimer > 2)
+	{
+		fTimer = 0;
+		++stopIndex;
+	}
 	// draw a shapes
 	for (uint i = 0; i < m_uOrbits; ++i)
 	{
 		m_pMeshMngr->AddMeshToRenderList(m_shapeList[i], glm::rotate(m4Offset, 1.5708f, AXIS_X));
 
 		//calculate the current position
-		vector3 v3CurrentPos = vector3(i * .5f + 1, 0, 0);
+	//	vector3 debug = glm::lerp(stopsList[i][stopIndex % (i + 3)], stopsList[i][((stopIndex + 1) % (i + 3))], .5f);
+		vector3 v3CurrentPos = glm::lerp(stopsList[i][stopIndex % (i + 3)], stopsList[i][((stopIndex + 1) % (i + 3))], fTimer / 2);
 		matrix4 m4Model = glm::translate(m4Offset, v3CurrentPos);
 
 		//draw spheres
