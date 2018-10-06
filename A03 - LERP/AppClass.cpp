@@ -82,26 +82,49 @@ void Application::Display(void)
 	*/
 	//m4Offset = glm::rotate(IDENTITY_M4, 1.5708f, AXIS_Z);
 
-	//Get a timer
-	static float fTimer = 0;	//store the new timer
+	//Get timers for sphere movement and orbit scaling
+	static float fOrbitTimer = 0;	//store the new timer
 	static uint uClock = m_pSystem->GenClock(); //generate a new clock for that timer
-	fTimer += m_pSystem->GetDeltaTime(uClock); //get the delta time for that timer
+	fOrbitTimer += m_pSystem->GetDeltaTime(uClock); //get the delta time for that timer
+	// do the same with the orbit scale timer
+	static uint uScaleClock = m_pSystem->GenClock();
+	static float fScaleTimer = 1;
+	//fScaleTimer += m_pSystem->GetDeltaTime(uScaleClock);
+	static bool scaleIncreasing = true;
+	printf("%f\n", fScaleTimer);
+	if (scaleIncreasing)
+	{
+		fScaleTimer += m_pSystem->GetDeltaTime(uScaleClock);
+	}
+	else
+	{
+		fScaleTimer -= m_pSystem->GetDeltaTime(uScaleClock);
+	}
+
+	if (fScaleTimer > 2)
+	{
+		scaleIncreasing = false;
+	}
+	if (fScaleTimer < 1)
+	{
+		scaleIncreasing = true;
+	}
 
 	// indirectly measures what point a sphere is interpolating towards
 	static unsigned int stopIndex = 0;
 	// if two seconds pass, reset timer and increment stopIndex
-	if (fTimer > 2)
+	if (fOrbitTimer > 2)
 	{
-		fTimer = 0;
+		fOrbitTimer = 0;
 		++stopIndex;
 	}
 	// draw a shapes
 	for (uint i = 0; i < m_uOrbits; ++i)
 	{
-		m_pMeshMngr->AddMeshToRenderList(m_shapeList[i], glm::rotate(m4Offset, 1.5708f, AXIS_X));
+		m_pMeshMngr->AddMeshToRenderList(m_shapeList[i], glm::rotate(m4Offset, 1.5708f, AXIS_X) * glm::scale(vector3(fScaleTimer, fScaleTimer, fScaleTimer)));
 
 		//calculate the current position
-		vector3 v3CurrentPos = glm::lerp(stopsList[i][stopIndex % (i + 3)], stopsList[i][((stopIndex + 1) % (i + 3))], fTimer / 2);
+		vector3 v3CurrentPos = glm::lerp(stopsList[i][stopIndex % (i + 3)], stopsList[i][((stopIndex + 1) % (i + 3))], fOrbitTimer / 2) * fScaleTimer;
 		matrix4 m4Model = glm::translate(m4Offset, v3CurrentPos);
 
 		//draw spheres
