@@ -1,5 +1,6 @@
 #include "AppClass.h"
 
+vector3** stopsList;
 void Application::InitVariables(void)
 {
 	//Change this to your name and email
@@ -44,7 +45,7 @@ void Application::InitVariables(void)
 		for (int k = 0; k < j; k++, angle += angleDelta)
 		{
 			vector3 debug = vector3(cos(angle), sin(angle), 0);
-			stopsList[i][k] = vector3(cos(angle), sin(angle), 0) * ((i + 1) * .1f);
+			stopsList[i][k] = vector3(cos(angle), sin(angle), 0) * (1 + (i * .5f));
 		}
 	}
 	
@@ -87,7 +88,7 @@ void Application::Display(void)
 	fTimer += m_pSystem->GetDeltaTime(uClock); //get the delta time for that timer
 
 	// indirectly measures what point a sphere is interpolating towards
-	static int stopIndex = 0;
+	static unsigned int stopIndex = 0;
 	// if two seconds pass, reset timer and increment stopIndex
 	if (fTimer > 2)
 	{
@@ -100,7 +101,6 @@ void Application::Display(void)
 		m_pMeshMngr->AddMeshToRenderList(m_shapeList[i], glm::rotate(m4Offset, 1.5708f, AXIS_X));
 
 		//calculate the current position
-	//	vector3 debug = glm::lerp(stopsList[i][stopIndex % (i + 3)], stopsList[i][((stopIndex + 1) % (i + 3))], .5f);
 		vector3 v3CurrentPos = glm::lerp(stopsList[i][stopIndex % (i + 3)], stopsList[i][((stopIndex + 1) % (i + 3))], fTimer / 2);
 		matrix4 m4Model = glm::translate(m4Offset, v3CurrentPos);
 
@@ -122,6 +122,11 @@ void Application::Display(void)
 }
 void Application::Release(void)
 {
+	for (int i = 0; i < m_uOrbits; ++i)
+	{
+		delete stopsList[i];
+	}
+	delete[] stopsList;
 	//release GUI
 	ShutdownGUI();
 }

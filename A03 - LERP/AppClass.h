@@ -45,7 +45,6 @@ private:
 	ControllerInput* m_pController[8]; //Controller
 	uint m_uActCont = 0; //Active Controller of the Application
 
-	vector3** stopsList;
 public:
 #pragma region Constructor / Run / Destructor
 	/*
