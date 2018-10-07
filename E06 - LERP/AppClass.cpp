@@ -62,7 +62,8 @@ void Application::Display(void)
 
 	//your code goes here
 	static int stopIndex = 0;
-	v3CurrentPos = glm::lerp(m_stopsList[stopIndex], m_stopsList[stopIndex + 1], fTimer);
+	// fTimer is divided by the distance between the interpolated points to maintain constant speed
+	v3CurrentPos = glm::lerp(m_stopsList[stopIndex], m_stopsList[stopIndex + 1], fTimer / glm::distance(m_stopsList[stopIndex], m_stopsList[stopIndex + 1]));
 	// if the currentPosition is close enough to its position, move on to the next stop
 	if (glm::distance(v3CurrentPos, m_stopsList[stopIndex + 1]) < .1)
 	{
