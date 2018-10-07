@@ -42,6 +42,9 @@ _Binary/*_d.ini
 *.lib
 *.lib
 *.dll
+<<<<<<< HEAD
+=======
 *.exe
+>>>>>>> bc497cc32f2a1d17cc765e2f2e6cde25e2aad503
 *.ini
 *.ini
