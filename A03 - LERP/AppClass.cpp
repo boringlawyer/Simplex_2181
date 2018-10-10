@@ -33,11 +33,14 @@ void Application::InitVariables(void)
 	/*
 		This part will create the orbits, it start at 3 because that is the minimum subdivisions a torus can have
 	*/
+	// holds the stops for every sphere
 	stopsList = new vector3*[m_uOrbits];
 	// the angle used to make the stop
 	float angle = 0;
 	// the change in the angle each iteration of the second loop
 	float angleDelta = 0;
+	// initialize the 2D array. The outer array will be for each orbit, and the inner
+	// array will be the stops in each orbit
 	for (int i = 0, j = 3; i < m_uOrbits; ++i, ++j)
 	{
 		stopsList[i] = new vector3[j];
@@ -89,9 +92,8 @@ void Application::Display(void)
 	// do the same with the orbit scale timer
 	static uint uScaleClock = m_pSystem->GenClock();
 	static float fScaleTimer = 1;
-	//fScaleTimer += m_pSystem->GetDeltaTime(uScaleClock);
 	static bool scaleIncreasing = true;
-	printf("%f\n", fScaleTimer);
+	// if fScaleTimer is greater than 2, decrement it until it is less than 1, and vice versa.
 	if (scaleIncreasing)
 	{
 		fScaleTimer += m_pSystem->GetDeltaTime(uScaleClock);
@@ -121,9 +123,16 @@ void Application::Display(void)
 	// draw a shapes
 	for (uint i = 0; i < m_uOrbits; ++i)
 	{
+		// scale each of the orbit's transform by vector3(fScaleTimer) so they cyclically
+		// scale and shrink
 		m_pMeshMngr->AddMeshToRenderList(m_shapeList[i], glm::rotate(m4Offset, 1.5708f, AXIS_X) * glm::scale(vector3(fScaleTimer, fScaleTimer, fScaleTimer)));
 
 		//calculate the current position
+		// i represents the orbit itself. By using modulus, we ensure that the 2nd index will 
+		// always be in range. i.e. on the 3rd orbit with 5 sides, stop index will between 0 and 4.
+		// The "a" value in glm::lerp is fOrbitTimer divided by 2 because it takes 2 seconds 
+		// to travel between stops. 
+		// Multiplying by fScaleTimer causes the paths to expand or shrink along with the orbits.
 		vector3 v3CurrentPos = glm::lerp(stopsList[i][stopIndex % (i + 3)], stopsList[i][((stopIndex + 1) % (i + 3))], fOrbitTimer / 2) * fScaleTimer;
 		matrix4 m4Model = glm::translate(m4Offset, v3CurrentPos);
 
