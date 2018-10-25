@@ -153,44 +153,38 @@ void Simplex::MyCamera::CalculateProjectionMatrix(void)
 
 void MyCamera::MoveForward(float a_fDistance)
 {
-	//The following is just an example and does not take in account the forward vector (AKA view vector)
-	m_v3Position += vector3(0.0f, 0.0f,a_fDistance) * glm::inverse(targetRot);
-	m_v3Target += vector3(0.0f, 0.0f, a_fDistance) * glm::inverse(targetRot);
-	m_v3Above += vector3(0.0f, 0.0f, a_fDistance) * glm::inverse(targetRot);
+	// rotates the forward vector so it moves in the direction where it is facing
+	m_v3Position += vector3(0.0f, 0.0f,a_fDistance) * glm::inverse(cameraRot);
+	m_v3Target += vector3(0.0f, 0.0f, a_fDistance) * glm::inverse(cameraRot);
+	m_v3Above += vector3(0.0f, 0.0f, a_fDistance) * glm::inverse(cameraRot);
 }
 
 void MyCamera::MoveVertical(float a_fDistance)
 {
-	m_v3Position += vector3(0.0f, a_fDistance, 0.0f) * glm::inverse(targetRot);
-	m_v3Target += vector3(0.0f, a_fDistance, 0) * glm::inverse(targetRot);
-	m_v3Above += vector3(0.0f, a_fDistance, 0) * glm::inverse(targetRot);
-}//Needs to be defined
+	m_v3Position += vector3(0.0f, a_fDistance, 0.0f) * glm::inverse(cameraRot);
+	m_v3Target += vector3(0.0f, a_fDistance, 0) * glm::inverse(cameraRot);
+	m_v3Above += vector3(0.0f, a_fDistance, 0) * glm::inverse(cameraRot);
+}
+// does what MoveForward does but instead of forward it is side-to-side
 void MyCamera::MoveSideways(float a_fDistance)
 {
-	m_v3Position += vector3(-a_fDistance, 0.0f, 0.0f) * glm::inverse(targetRot);
-	m_v3Target += vector3(-a_fDistance, 0.0f, 0) * glm::inverse(targetRot);
-	m_v3Above += vector3(-a_fDistance, 0.0f, 0) * glm::inverse(targetRot);
+	m_v3Position += vector3(-a_fDistance, 0.0f, 0.0f) * glm::inverse(cameraRot);
+	m_v3Target += vector3(-a_fDistance, 0.0f, 0) * glm::inverse(cameraRot);
+	m_v3Above += vector3(-a_fDistance, 0.0f, 0) * glm::inverse(cameraRot);
 
-}//Needs to be defined
-
-void MyCamera::ChangeYaw(float yaw)
-{
-	targetRot = glm::rotate(targetRot, yaw, vector3(0, 1, 0));
-	this->SetTarget(glm::rotate(targetRot, vector3(0, 0, 1)) + GetPosition());
-	this->SetAbove(glm::rotate(targetRot, vector3(0, 1, 0)) + GetPosition());
-	vector3 target = this->GetTarget();
-	target = target;
-	vector3 above = GetAbove();
-	above = above;
 }
 
+// rotates the camera on the Y axis
+void MyCamera::ChangeYaw(float yaw)
+{
+	cameraRot = glm::rotate(cameraRot, yaw, vector3(0, 1, 0));
+	this->SetTarget(glm::rotate(cameraRot, vector3(0, 0, 1)) + GetPosition());
+	this->SetAbove(glm::rotate(cameraRot, vector3(0, 1, 0)) + GetPosition());
+}
+// rotates the camera on the X axis
 void Simplex::MyCamera::ChangePitch(float pitch)
 {
-	targetRot = glm::rotate(targetRot, pitch, vector3(1, 0, 0));
-	this->SetTarget(glm::rotate(targetRot, vector3(0, 0, 1)) + GetPosition());
-	this->SetAbove(glm::rotate(targetRot, vector3(0, 1, 0)) + GetPosition());
-	vector3 target = this->GetTarget();
-	vector3 above = GetAbove();
-	above = above;
-	target = target;
+	cameraRot = glm::rotate(cameraRot, pitch, vector3(1, 0, 0));
+	this->SetTarget(glm::rotate(cameraRot, vector3(0, 0, 1)) + GetPosition());
+	this->SetAbove(glm::rotate(cameraRot, vector3(0, 1, 0)) + GetPosition());
 }
