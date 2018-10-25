@@ -104,6 +104,7 @@ void Simplex::MyCamera::ResetCamera(void)
 	m_v3Target = vector3(0.0f, 0.0f, 0.0f); //What I'm looking at
 	m_v3Above = vector3(0.0f, 1.0f, 0.0f); //What is above the camera
 
+
 	m_bPerspective = true; //perspective view? False is Orthographic
 
 	m_fFOV = 45.0f; //Field of View
@@ -153,10 +154,43 @@ void Simplex::MyCamera::CalculateProjectionMatrix(void)
 void MyCamera::MoveForward(float a_fDistance)
 {
 	//The following is just an example and does not take in account the forward vector (AKA view vector)
-	m_v3Position += vector3(0.0f, 0.0f,-a_fDistance);
-	m_v3Target += vector3(0.0f, 0.0f, -a_fDistance);
-	m_v3Above += vector3(0.0f, 0.0f, -a_fDistance);
+	m_v3Position += vector3(0.0f, 0.0f,a_fDistance) * glm::inverse(targetRot);
+	m_v3Target += vector3(0.0f, 0.0f, a_fDistance) * glm::inverse(targetRot);
+	m_v3Above += vector3(0.0f, 0.0f, a_fDistance) * glm::inverse(targetRot);
 }
 
-void MyCamera::MoveVertical(float a_fDistance){}//Needs to be defined
-void MyCamera::MoveSideways(float a_fDistance){}//Needs to be defined
+void MyCamera::MoveVertical(float a_fDistance)
+{
+	m_v3Position += vector3(0.0f, a_fDistance, 0.0f) * glm::inverse(targetRot);
+	m_v3Target += vector3(0.0f, a_fDistance, 0) * glm::inverse(targetRot);
+	m_v3Above += vector3(0.0f, a_fDistance, 0) * glm::inverse(targetRot);
+}//Needs to be defined
+void MyCamera::MoveSideways(float a_fDistance)
+{
+	m_v3Position += vector3(-a_fDistance, 0.0f, 0.0f) * glm::inverse(targetRot);
+	m_v3Target += vector3(-a_fDistance, 0.0f, 0) * glm::inverse(targetRot);
+	m_v3Above += vector3(-a_fDistance, 0.0f, 0) * glm::inverse(targetRot);
+
+}//Needs to be defined
+
+void MyCamera::ChangeYaw(float yaw)
+{
+	targetRot = glm::rotate(targetRot, yaw, vector3(0, 1, 0));
+	this->SetTarget(glm::rotate(targetRot, vector3(0, 0, 1)) + GetPosition());
+	this->SetAbove(glm::rotate(targetRot, vector3(0, 1, 0)) + GetPosition());
+	vector3 target = this->GetTarget();
+	target = target;
+	vector3 above = GetAbove();
+	above = above;
+}
+
+void Simplex::MyCamera::ChangePitch(float pitch)
+{
+	targetRot = glm::rotate(targetRot, pitch, vector3(1, 0, 0));
+	this->SetTarget(glm::rotate(targetRot, vector3(0, 0, 1)) + GetPosition());
+	this->SetAbove(glm::rotate(targetRot, vector3(0, 1, 0)) + GetPosition());
+	vector3 target = this->GetTarget();
+	vector3 above = GetAbove();
+	above = above;
+	target = target;
+}

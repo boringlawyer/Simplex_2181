@@ -16,6 +16,9 @@ class MyCamera
 	vector3 m_v3Target = vector3(0.0f, 0.0f, 0.0f); //What I'm looking at
 	vector3 m_v3Above = vector3(0.0f, 1.0f, 0.0f); //What is above the camera
 
+	glm::quat targetRot = glm::angleAxis(0.0f, vector3(0, 0, 1));
+	glm::quat aboveRot = glm::angleAxis(0.0f, vector3(0, 1, 0));
+
 	bool m_bPerspective = true; //perspective view? False is Orthographic
 
 	float m_fFOV = 45.0f; //Field of View
@@ -230,6 +233,18 @@ public:
 	OUTPUT: ---
 	*/
 	void MoveSideways(float a_fDistance = 0.1f);
+	/*
+	USAGE: Changes yaw
+	ARGUMENTS: float yaw -> the amount of yaw
+	OUTPUT: ---
+	*/
+	void ChangeYaw(float yaw);
+	/*
+	USAGE: Changes pitch
+	ARGUMENTS: float pitch -> the amount of pitch
+	OUTPUT: ---
+	*/
+	void ChangePitch(float pitch);
 };
 
 } //namespace Simplex
