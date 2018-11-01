@@ -24,6 +24,12 @@ void Application::InitVariables(void)
 	m_pSteve = new Model();
 	m_pSteve->Load("Minecraft\\Steve.obj");
 	m_pSteveRB= new MyRigidBody(m_pSteve->GetVertexList());
+
+	minSphere = new Mesh();
+	maxSphere = new Mesh();
+
+	minSphere->GenerateSphere(.5, 5);
+	maxSphere->GenerateSphere(.5, 5);
 }
 void Application::Update(void)
 {
@@ -67,6 +73,10 @@ void Application::Display(void)
 	//Clear the screen
 	ClearScreen();
 
+	maxSphere->Render(m_pCameraMngr->GetProjectionMatrix(), m_pCameraMngr->GetViewMatrix(), glm::translate(m_pCreeperRB->GetMinGlobal())/* * ToMatrix4(m_qCreeper)*//* * ToMatrix4(m_qArcBall)*/);
+	maxSphere->Render(m_pCameraMngr->GetProjectionMatrix(), m_pCameraMngr->GetViewMatrix(), glm::translate(m_pCreeperRB->GetMaxGlobal())/* * ToMatrix4(m_qCreeper)*//* * ToMatrix4(m_qArcBall)*/);
+	maxSphere->Render(m_pCameraMngr->GetProjectionMatrix(), m_pCameraMngr->GetViewMatrix(), glm::translate(m_pCreeperRB->GetCenterGlobal())/* * ToMatrix4(m_qCreeper)*//* * ToMatrix4(m_qArcBall)*/);
+
 	//Add grid to the scene
 	m_pMeshMngr->AddGridToRenderList();
 
@@ -99,6 +109,10 @@ void Application::Release(void)
 	//release the rigid body for the model
 	SafeDelete(m_pSteveRB);
 	
+
+	// for testing purposes
+	SafeDelete(minSphere);
+	SafeDelete(maxSphere);
 	//release GUI
 	ShutdownGUI();
 }

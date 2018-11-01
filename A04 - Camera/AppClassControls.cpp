@@ -379,6 +379,17 @@ void Application::CameraRotation(float a_fSpeed)
 		//cameraRot = glm::rotate(cameraRot, glm::radians(1.0f), vector3(1, 0, 0));
 	}
 	//Change the Yaw and the Pitch of the camera
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+	//m_pCamera->SetTarget(glm::angleAxis(glm::radians(1.0f), vector3(0, 1, 0)) * m_pCamera->GetTarget());
+	glm::quat targetRot = glm::quat();
+	//targetRot = glm::rotate(targetRot, fAngleX, vector3(1, 0, 0));
+	targetRot = glm::rotate(targetRot, fAngleY, vector3(0, 1, 0));
+	//m_pCamera->SetTarget(glm::rotate(m_pCamera->GetTarget(), glm::radians(1.0f), vector3(0, 1, 0)));
+	m_pCamera->SetTarget(m_pCamera->GetTarget() * targetRot);
+=======
+>>>>>>> Stashed changes
 	if (fAngleX < 0)
 	{
 		m_pCamera->ChangePitch(glm::radians(2.0f));
@@ -399,6 +410,10 @@ void Application::CameraRotation(float a_fSpeed)
 	//deltaRotation *= glm::angleAxis(fAngleY, glm::vec3(1, 0, 0));
 	//m_pCamera->SetTarget(glm::rotate(deltaRotation, m_pCamera->GetTarget()));
 	//m_pCamera->SetTarget(glm::rotate(cameraRot, vector3(0, 5, 1)));
+<<<<<<< Updated upstream
+=======
+>>>>>>> 38de89bd3000edd6a76a2e40a1be411c855eb7a4
+>>>>>>> Stashed changes
 	SetCursorPos(CenterX, CenterY);//Position the mouse in the center
 }
 //Keyboard

@@ -85,8 +85,8 @@ void MyRigidBody::SetModelMatrix(matrix4 a_m4ModelMatrix)
 	m_m4ToWorld = a_m4ModelMatrix;
 	
 	//your code goes here---------------------
-	m_v3MinG = m_v3MinL;
-	m_v3MaxG = m_v3MaxL;
+	m_v3MinG = m_v3MinL * glm::toQuat(glm::inverse(a_m4ModelMatrix)) * glm::toQuat(glm::inverse(a_m4ModelMatrix / 2));
+	m_v3MaxG = m_v3MaxL * glm::toQuat(glm::inverse(a_m4ModelMatrix)) * glm::toQuat(glm::inverse(a_m4ModelMatrix / 2));
 	//----------------------------------------
 
 	//we calculate the distance between min and max vectors
