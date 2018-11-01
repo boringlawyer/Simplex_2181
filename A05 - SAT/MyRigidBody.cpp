@@ -232,7 +232,7 @@ bool MyRigidBody::IsColliding(MyRigidBody* const a_pOther)
 	//if they are colliding check the SAT
 	if (bColliding)
 	{
-		if(SAT(a_pOther) != eSATResults::SAT_NONE)
+		if(SAT(a_pOther) == eSATResults::SAT_NONE)
 			bColliding = false;// reset to false
 	}
 
@@ -293,6 +293,21 @@ bool ProjectionsOverlapping(MyRigidBody* a, MyRigidBody* b, vector3 axis)
 	return glm::length(proj(aMaxProj - aCenterProj, axis)) + glm::length(proj(bMaxProj - bCenterProj, axis)) > glm::length(proj(a->GetCenterGlobal() - b->GetCenterGlobal(), axis));
 }
 
+// like the method above, but the axis is derived from the cross product of aCross and bCross
+bool ProjectionsOverlapping(MyRigidBody* a, MyRigidBody* b, vector3 aCross, vector3 bCross)
+{
+	vector3 axis = glm::cross(aCross, bCross);
+	if (axis == vector3(0, 0, 0))
+	{
+		axis = glm::cross(aCross, b->GetCenterGlobal() - a->GetCenterGlobal());
+		if (axis != vector3(0, 0, 0))
+		{
+			return ProjectionsOverlapping(a, b, axis);
+		}
+	}
+	return true;
+}
+
 uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 {
 	// local axes for rigidbody a and b
@@ -306,46 +321,20 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 
 	bool isColliding = true;
 
-	//vector3 aMinProj = proj(this->GetCenterGlobal(), aX);
-	//vector3 aMaxProj = proj(this->GetMaxGlobal(), aX);
-	//vector3 bMinProj = proj(a_pOther->GetCenterGlobal(), aX);
-	//vector3 bMaxProj = proj(a_pOther->GetMaxGlobal(), aX);
-	////vector3 aMaxGlobal = GetMaxGlobal();
-	////vector3 aMinGlobal = GetMinGlobal();
-	////vector3 bMaxGlobal = a_pOther->GetMaxGlobal();
-	////vector3 bMinGlobal = a_pOther->GetMinGlobal();
-	//bool isXOverlapping = glm::length(proj(aMaxProj - aMinProj, aX)) + glm::length(proj(bMaxProj - bMinProj, aX)) > glm::length(proj(this->GetCenterGlobal() - a_pOther->GetCenterGlobal(), aX));
-	//if (ProjectionsOverlapping(this, a_pOther, aX))
-	//{
-	//	aX = aX;
-	//}
 	// does the 15 tests required for SAT
 	isColliding = ProjectionsOverlapping(this, a_pOther, aX) && ProjectionsOverlapping(this, a_pOther, aY)
 		&& ProjectionsOverlapping(this, a_pOther, aZ) && ProjectionsOverlapping(this, a_pOther, bX)
 		&& ProjectionsOverlapping(this, a_pOther, bY) && ProjectionsOverlapping(this, a_pOther, bZ)
-		&& ProjectionsOverlapping(this, a_pOther, glm::cross(aX, bX)) && ProjectionsOverlapping(this, a_pOther, glm::cross(aY, bX))
-		&& ProjectionsOverlapping(this, a_pOther, glm::cross(aZ, bX)) && ProjectionsOverlapping(this, a_pOther, glm::cross(aX, bY))
-		&& ProjectionsOverlapping(this, a_pOther, glm::cross(aY, bY)) && ProjectionsOverlapping(this, a_pOther, glm::cross(aZ, bY))
-		&& ProjectionsOverlapping(this, a_pOther, glm::cross(aX, bZ)) && ProjectionsOverlapping(this, a_pOther, glm::cross(aY, bZ))
-		&& ProjectionsOverlapping(this, a_pOther, glm::cross(aZ, bZ));
+		&& ProjectionsOverlapping(this, a_pOther, aX, bX) && ProjectionsOverlapping(this, a_pOther, aY, bX)
+		&& ProjectionsOverlapping(this, a_pOther, aZ, bX) && ProjectionsOverlapping(this, a_pOther, aX, bY)
+		&& ProjectionsOverlapping(this, a_pOther, aY, bY) && ProjectionsOverlapping(this, a_pOther, aZ, bY)
+		&& ProjectionsOverlapping(this, a_pOther, aX, bZ) && ProjectionsOverlapping(this, a_pOther, aY, bZ)
+		&& ProjectionsOverlapping(this, a_pOther, aZ, bZ);
 	//isColliding = ProjectionsOverlapping(this, a_pOther, glm::cross(aZ, bZ));
 	if (isColliding)
 	{
 		return 1;
 	}
-	/*vector3 proj = (vector3(.7, 1, 1) * (vector3(1, 0, 0) / 1)) * (vector3(1, 0, 0) / 1);
-	m_pMeshMngr->AddLineToRenderList(m_m4ToWorld, vector3(0, 0, 0), proj, C_WHITE, C_RED);*/
-	/*
-	Your code goes here instead of this comment;
-
-	For this method, if there is an axis that separates the two objects
-	then the return will be different than 0; 1 for any separating axis
-	is ok if you are not going for the extra credit, if you could not
-	find a separating axis you need to return 0, there is an enum in
-	Simplex that might help you [eSATResults] feel free to use it.
-	(eSATResults::SAT_NONE has a value of 0)
-	*/
-
 	//there is no axis test that separates this two objects
 	return eSATResults::SAT_NONE;
 }
