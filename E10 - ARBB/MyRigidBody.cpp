@@ -85,10 +85,58 @@ void MyRigidBody::SetModelMatrix(matrix4 a_m4ModelMatrix)
 	m_m4ToWorld = a_m4ModelMatrix;
 	
 	//your code goes here---------------------
-	m_v3MinG = m_v3MinL * glm::toQuat(glm::inverse(a_m4ModelMatrix)) * glm::toQuat(glm::inverse(a_m4ModelMatrix / 2));
-	m_v3MaxG = m_v3MaxL * glm::toQuat(glm::inverse(a_m4ModelMatrix)) * glm::toQuat(glm::inverse(a_m4ModelMatrix / 2));
+	//m_v3MinG = vector4(m_v3MinL, 1) * a_m4ModelMatrix;
+	//m_v3MaxG = vector4(m_v3MaxL, 1) * a_m4ModelMatrix;
+	vector3 vertices[8];
+	vector3 centerToPoint = m_v3MaxL - m_v3Center;
+	vertices[0] = m_v3Center + centerToPoint;
+	vertices[1] = m_v3Center - centerToPoint;
+	vertices[2] = m_v3Center + vector3(centerToPoint.x, centerToPoint.y, -centerToPoint.z);
+	vertices[3] = m_v3Center + vector3(-centerToPoint.x, centerToPoint.y, centerToPoint.z);
+	vertices[4] = m_v3Center + vector3(-centerToPoint.x, centerToPoint.y, -centerToPoint.z);
+	vertices[5] = m_v3Center + vector3(centerToPoint.x, -centerToPoint.y, centerToPoint.z);
+	vertices[6] = m_v3Center + vector3(-centerToPoint.x, -centerToPoint.y, centerToPoint.z);
+	vertices[7] = m_v3Center + vector3(centerToPoint.x, -centerToPoint.y, -centerToPoint.z);
+	for (int i = 0; i < 8; ++i)
+	{
+		vertices[i] = vector4(vertices[i], 1) * a_m4ModelMatrix;
+	}
+	float maxX = 0;
+	float maxY = 0;
+	float maxZ = 0;
+	float minX = FLT_MAX;
+	float minY = FLT_MAX;
+	float minZ = FLT_MAX;
+	for (int i = 0; i < 8; ++i)
+	{
+		if (vertices[i].x > maxX)
+		{
+			maxX = vertices[i].x;
+		}
+		if (vertices[i].y > maxY)
+		{
+			maxY = vertices[i].y;
+		}
+		if (vertices[i].z > maxZ)
+		{
+			maxZ = vertices[i].z;
+		}
+		if (vertices[i].x < minX)
+		{
+			minX = vertices[i].x;
+		}
+		if (vertices[i].y < minY)
+		{
+			minY = vertices[i].y;
+		}
+		if (vertices[i].z < minZ)
+		{
+			minZ = vertices[i].z;
+		}
+	}
+	m_v3MaxG = vector3(maxX, maxY, maxZ);
+	m_v3MinG = vector3(minX, minY, minZ);
 	//----------------------------------------
-
 	//we calculate the distance between min and max vectors
 	m_v3ARBBSize = m_v3MaxG - m_v3MinG;
 }

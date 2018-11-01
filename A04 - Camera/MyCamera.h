@@ -16,8 +16,8 @@ class MyCamera
 	vector3 m_v3Target = vector3(0.0f, 0.0f, 0.0f); //What I'm looking at
 	vector3 m_v3Above = vector3(0.0f, 1.0f, 0.0f); //What is above the camera
 
-	glm::quat targetRot = glm::angleAxis(0.0f, vector3(0, 0, 1));
-	glm::quat aboveRot = glm::angleAxis(0.0f, vector3(0, 1, 0));
+	// the general orientation of the camera
+	glm::quat cameraRot = glm::angleAxis(0.0f, vector3(0, 0, 1));
 
 	bool m_bPerspective = true; //perspective view? False is Orthographic
 

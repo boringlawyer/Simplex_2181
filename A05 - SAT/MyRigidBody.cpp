@@ -273,9 +273,68 @@ void MyRigidBody::AddToRenderList(void)
 			m_pMeshMngr->AddWireCubeToRenderList(glm::translate(GetCenterGlobal()) * glm::scale(m_v3ARBBSize), C_YELLOW);
 	}
 }
+// projects vector a onto vector b
+vector3 proj(vector3 a, vector3 b)
+{
+	return (a * b / glm::length(b)) * (b / glm::length(b));
+}
+// checks to see if the projections of the boxes onto the axis are overlapping.
+// Done for each of the 15 tests
+bool ProjectionsOverlapping(MyRigidBody* a, MyRigidBody* b, vector3 axis)
+{
+	if (axis == vector3(0, 0, 0))
+	{
+		return true;
+	}
+	vector3 aCenterProj = proj(a->GetCenterGlobal(), axis);
+	vector3 aMaxProj = proj(a->GetMaxGlobal(), axis);
+	vector3 bCenterProj = proj(b->GetCenterGlobal(), axis);
+	vector3 bMaxProj = proj(b->GetMaxGlobal(), axis);
+	return glm::length(proj(aMaxProj - aCenterProj, axis)) + glm::length(proj(bMaxProj - bCenterProj, axis)) > glm::length(proj(a->GetCenterGlobal() - b->GetCenterGlobal(), axis));
+}
 
 uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 {
+	// local axes for rigidbody a and b
+	vector3 aX = glm::vec4(1, 0, 0, 1) * glm::inverse(m_m4ToWorld);
+	vector3 aY = glm::vec4(0, 1, 0, 1) * glm::inverse(m_m4ToWorld);
+	vector3 aZ = glm::vec4(0, 0, 1, 1) * glm::inverse(m_m4ToWorld);
+	
+	vector3 bX = glm::vec4(1, 0, 0, 1) * glm::inverse(a_pOther->GetModelMatrix());
+	vector3 bY = glm::vec4(0, 1, 0, 1) * glm::inverse(a_pOther->GetModelMatrix());
+	vector3 bZ = glm::vec4(0, 0, 1, 1) * glm::inverse(a_pOther->GetModelMatrix());
+
+	bool isColliding = true;
+
+	//vector3 aMinProj = proj(this->GetCenterGlobal(), aX);
+	//vector3 aMaxProj = proj(this->GetMaxGlobal(), aX);
+	//vector3 bMinProj = proj(a_pOther->GetCenterGlobal(), aX);
+	//vector3 bMaxProj = proj(a_pOther->GetMaxGlobal(), aX);
+	////vector3 aMaxGlobal = GetMaxGlobal();
+	////vector3 aMinGlobal = GetMinGlobal();
+	////vector3 bMaxGlobal = a_pOther->GetMaxGlobal();
+	////vector3 bMinGlobal = a_pOther->GetMinGlobal();
+	//bool isXOverlapping = glm::length(proj(aMaxProj - aMinProj, aX)) + glm::length(proj(bMaxProj - bMinProj, aX)) > glm::length(proj(this->GetCenterGlobal() - a_pOther->GetCenterGlobal(), aX));
+	//if (ProjectionsOverlapping(this, a_pOther, aX))
+	//{
+	//	aX = aX;
+	//}
+	// does the 15 tests required for SAT
+	isColliding = ProjectionsOverlapping(this, a_pOther, aX) && ProjectionsOverlapping(this, a_pOther, aY)
+		&& ProjectionsOverlapping(this, a_pOther, aZ) && ProjectionsOverlapping(this, a_pOther, bX)
+		&& ProjectionsOverlapping(this, a_pOther, bY) && ProjectionsOverlapping(this, a_pOther, bZ)
+		&& ProjectionsOverlapping(this, a_pOther, glm::cross(aX, bX)) && ProjectionsOverlapping(this, a_pOther, glm::cross(aY, bX))
+		&& ProjectionsOverlapping(this, a_pOther, glm::cross(aZ, bX)) && ProjectionsOverlapping(this, a_pOther, glm::cross(aX, bY))
+		&& ProjectionsOverlapping(this, a_pOther, glm::cross(aY, bY)) && ProjectionsOverlapping(this, a_pOther, glm::cross(aZ, bY))
+		&& ProjectionsOverlapping(this, a_pOther, glm::cross(aX, bZ)) && ProjectionsOverlapping(this, a_pOther, glm::cross(aY, bZ))
+		&& ProjectionsOverlapping(this, a_pOther, glm::cross(aZ, bZ));
+	//isColliding = ProjectionsOverlapping(this, a_pOther, glm::cross(aZ, bZ));
+	if (isColliding)
+	{
+		return 1;
+	}
+	/*vector3 proj = (vector3(.7, 1, 1) * (vector3(1, 0, 0) / 1)) * (vector3(1, 0, 0) / 1);
+	m_pMeshMngr->AddLineToRenderList(m_m4ToWorld, vector3(0, 0, 0), proj, C_WHITE, C_RED);*/
 	/*
 	Your code goes here instead of this comment;
 
