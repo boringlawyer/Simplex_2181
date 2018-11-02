@@ -8,7 +8,6 @@ void MyEntityManager::Init(void)
 }
 void MyEntityManager::Release(void)
 {
-	delete m_pInstance;
 	for (int i = 0; i < m_uEntityCount; ++i)
 	{
 		delete m_entityList[i];
@@ -24,6 +23,7 @@ MyEntityManager* MyEntityManager::GetInstance()
 }
 void MyEntityManager::ReleaseInstance()
 {
+	delete m_pInstance;
 }
 int Simplex::MyEntityManager::GetEntityIndex(String a_sUniqueID)
 {
@@ -89,12 +89,19 @@ MyEntityManager::~MyEntityManager(){Release();};
 // other methods
 void Simplex::MyEntityManager::Update(void)
 {
-
+	for (int i = 0; i < m_entityList.size() -1; ++i)
+	{
+		for (int j = i + 1; j < m_entityList.size(); ++j)
+		{
+			m_entityList[i]->IsColliding(m_entityList[j]);
+		}
+	}
 }
 void Simplex::MyEntityManager::AddEntity(String a_sFileName, String a_sUniqueID)
 {
 	MyEntity* newEntity = new MyEntity(a_sFileName, a_sUniqueID);
 	m_entityList.push_back(newEntity);
+	++m_uEntityCount;
 }
 void Simplex::MyEntityManager::RemoveEntity(uint a_uIndex)
 {
@@ -104,16 +111,10 @@ void Simplex::MyEntityManager::RemoveEntity(uint a_uIndex)
 	}
 	std::vector<MyEntity*>::iterator iter = m_entityList.begin() + a_uIndex;
 	m_entityList.erase(iter, iter);
+	--m_uEntityCount;
 }
 void Simplex::MyEntityManager::RemoveEntity(String a_sUniqueID)
 {
-	//for (std::vector<MyEntity*>::iterator it = m_entityList.begin(); it != m_entityList.end(); ++it)
-	//{
-	//	if ((*it)->GetUniqueID() == a_sUniqueID)
-	//	{
-	//		m_entityList.erase(it, it);
-	//	}
-	//}
 	MyEntity* toRemove = MyEntity::GetEntity(a_sUniqueID);
 	std::vector<MyEntity*>::iterator it = m_entityList._Make_iterator(&toRemove);
 	m_entityList.erase(it, it);
