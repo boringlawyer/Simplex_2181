@@ -22,7 +22,7 @@ class Application
 	uint m_uObjects = 0; //Number of objects in the scene
 	uint m_uOctantLevels = 0; //Number of levels in the octree
 private:
-	String m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu"; //programmer
+	String m_sProgrammer = "Caleb Katzenstein - cnk5777@rit.edu"; //programmer
 
 	static ImGuiObject gui; //GUI object
 	bool m_bGUI_Main = true; //show Main GUI window?
@@ -169,6 +169,12 @@ private:
 	OUTPUT: ---
 	*/
 	void ReleaseControllers(void);
+	/*
+	USAGE: Assigns each identity dimensions based on their locations
+	ARGUMENTS:
+	OUTPUT: ---
+	*/
+	void AssignDimensions(void);
 #pragma endregion
 
 #pragma region Application Controls
