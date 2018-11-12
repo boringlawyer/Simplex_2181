@@ -6,7 +6,6 @@ Date: 2017/07
 #define __MYOCTANTCLASS_H_
 
 #include "MyEntityManager.h"
-
 namespace Simplex
 {
 
@@ -67,7 +66,7 @@ public:
 	ARGUMENTS: class object to copy
 	OUTPUT: ---
 	*/
-	MyOctant& operator=(MyOctant const& other);
+	//MyOctant& operator=(MyOctant const& other);
 	/*
 	USAGE: Destructor
 	ARGUMENTS: ---

@@ -225,7 +225,7 @@ bool Simplex::MyEntity::SharesDimension(MyEntity* const a_pOther)
 	{
 		for (uint j = 0; j < a_pOther->m_nDimensionCount; j++)
 		{
-			if (m_DimensionArray[i] == a_pOther->m_DimensionArray[j])
+			if (m_DimensionArray[i] == a_pOther->m_DimensionArray[j]/* && m_DimensionArray[i] != 0*/)
 				return true; //as soon as we find one we know they share dimensionality
 		}
 	}

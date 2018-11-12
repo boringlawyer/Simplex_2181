@@ -9,7 +9,12 @@ void Application::InitVariables(void)
 		vector3(0.0f, 0.0f, 100.0f), //Position
 		vector3(0.0f, 0.0f, 99.0f),	//Target
 		AXIS_Y);					//Up
-
+	octant = new MyOctant(vector3(0, 0, 0), 68);
+	octant->Subdivide();
+	for (int i = 0; i < 8; ++i)
+	{
+		octant->GetChild(i)->Subdivide();
+	}
 	m_pLightMngr->SetPosition(vector3(0.0f, 3.0f, 13.0f), 1); //set the position of first light (0 is reserved for ambient light)
 
 #ifdef DEBUG
@@ -36,7 +41,11 @@ void Application::InitVariables(void)
 	//	m_pEntityMngr->GetEntity(i)->AddDimension(i);
 	//}
 	m_uOctantLevels = 2;
-	AssignDimensions();
+	//for (int i = 0; i < m_pEntityMngr->GetEntityCount(); ++i)
+	//{
+	//	octant->IsColliding(i);
+	//}
+	//octant->ConstructTree();
 	m_pEntityMngr->Update();
 }
 void Application::AssignDimensions()
@@ -125,6 +134,7 @@ void Application::Display(void)
 	ClearScreen();
 
 	//display octree
+	octant->Display(C_YELLOW);
 	//m_pRoot->Display();
 	
 	// draw a skybox
@@ -138,7 +148,6 @@ void Application::Display(void)
 	
 	//draw gui,
 	DrawGUI();
-	
 	//end the current frame (internally swaps the front and back buffers)
 	m_pWindow->display();
 }
