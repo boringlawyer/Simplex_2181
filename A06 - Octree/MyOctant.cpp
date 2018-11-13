@@ -1,7 +1,7 @@
 #include "MyOctant.h"
 using namespace Simplex;
 uint MyOctant::m_uOctantCount;
-uint MyOctant::m_uMaxLevel = 3;
+uint MyOctant::m_uMaxLevel = 4;
 uint MyOctant::m_uIdealEntityCount = 50;
 Simplex::MyOctant::MyOctant(uint a_nMaxLevel, uint a_nIdealEntityCount)
 {
@@ -116,7 +116,10 @@ void Simplex::MyOctant::ConstructTree(uint a_nMaxLevel)
 	{
 		if (IsColliding(i))
 		{
-			m_pEntityMngr->GetEntity(i)->AddDimension(m_uID);
+			if (IsLeaf())
+			{
+				m_pEntityMngr->GetEntity(i)->AddDimension(m_uID);
+			}
 			++numEntities;
 			if (numEntities == m_uIdealEntityCount)
 			{

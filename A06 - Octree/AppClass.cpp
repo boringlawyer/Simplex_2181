@@ -45,7 +45,7 @@ void Application::InitVariables(void)
 	//{
 	//	octant->IsColliding(i);
 	//}
-	//octant->ConstructTree();
+	octant->ConstructTree();
 	m_pEntityMngr->Update();
 }
 void Application::AssignDimensions()
