@@ -1,7 +1,7 @@
 #include "MyOctant.h"
 using namespace Simplex;
 uint MyOctant::m_uOctantCount;
-uint MyOctant::m_uMaxLevel = 4;
+uint MyOctant::m_uMaxLevel = 70;
 uint MyOctant::m_uIdealEntityCount = 50;
 Simplex::MyOctant::MyOctant(uint a_nMaxLevel, uint a_nIdealEntityCount)
 {
@@ -35,6 +35,7 @@ Simplex::MyOctant::MyOctant(MyOctant const & other)
 
 Simplex::MyOctant::~MyOctant(void)
 {
+	KillBranches();
 }
 
 uint Simplex::MyOctant::GetOctantCount(void)
@@ -60,6 +61,10 @@ void Simplex::MyOctant::DisplayLeafs(vector3 a_v3Color)
 
 void Simplex::MyOctant::ClearEntityList(void)
 {
+	for (std::vector<uint>::iterator it = m_EntityList.begin(); it != m_EntityList.end(); ++it)
+	{
+		m_pEntityMngr->GetEntity(*it)->ClearDimensionSet();
+	}
 	m_EntityList.clear();
 	for (int i = 0; i < m_uChildren; ++i)
 	{
@@ -107,6 +112,15 @@ bool Simplex::MyOctant::ContainsMoreThan(uint a_nEntities)
 
 void Simplex::MyOctant::KillBranches(void)
 {
+	for (std::vector<uint>::iterator it = m_EntityList.begin(); it != m_EntityList.end(); ++it)
+	{
+		m_pEntityMngr->GetEntity(*it)->ClearDimensionSet();
+	}
+	for (int i = 0; i < m_uChildren; ++i)
+	{
+		m_pChild[i]->KillBranches();
+	}
+	//delete[] m_pChild;
 }
 
 void Simplex::MyOctant::ConstructTree(uint a_nMaxLevel)

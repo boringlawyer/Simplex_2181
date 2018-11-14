@@ -45,7 +45,7 @@ void Application::InitVariables(void)
 	//{
 	//	octant->IsColliding(i);
 	//}
-	octant->ConstructTree();
+	octant->ConstructTree(8);
 	m_pEntityMngr->Update();
 }
 void Application::AssignDimensions()
@@ -126,6 +126,10 @@ void Application::Update(void)
 
 	//Add objects to render list
 	m_pEntityMngr->AddEntityToRenderList(-1, true);
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::BackSpace))
+	{
+		octant->ClearEntityList();
+	}
 
 }
 void Application::Display(void)
