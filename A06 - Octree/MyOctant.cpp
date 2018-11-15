@@ -120,12 +120,12 @@ void Simplex::MyOctant::KillBranches(void)
 	{
 		m_pChild[i]->KillBranches();
 	}
-	//delete[] m_pChild;
 }
 
 void Simplex::MyOctant::ConstructTree(uint a_nMaxLevel)
 {
 	int numEntities = 0;
+	// for each entity, assign this octant's id to it if they are colliding and if this is a leaf
 	for (int i = 0; i < m_pEntityMngr->GetEntityCount(); ++i)
 	{
 		if (IsColliding(i))
@@ -135,6 +135,7 @@ void Simplex::MyOctant::ConstructTree(uint a_nMaxLevel)
 				m_pEntityMngr->GetEntity(i)->AddDimension(m_uID);
 			}
 			++numEntities;
+			// automatically subdivide if there are too many entities in here and if the max depth has not been reached
 			if (numEntities == m_uIdealEntityCount)
 			{
 				if (m_uLevel >= m_uMaxLevel)
@@ -185,6 +186,7 @@ vector3 Simplex::MyOctant::GetMaxGlobal(void)
 
 bool Simplex::MyOctant::IsColliding(uint a_uRBIndex)
 {
+	// does an old-school AABB on the rigidbody and the octant bounds
 	MyRigidBody* otherRB = m_pEntityMngr->GetEntity(a_uRBIndex)->GetRigidBody();
 	if ((m_v3Min.x <= otherRB->GetMaxGlobal().x && m_v3Max.x >= otherRB->GetMinGlobal().x) && (m_v3Min.y <= otherRB->GetMaxGlobal().y && m_v3Max.y >= otherRB->GetMinGlobal().y) && (m_v3Min.z <= otherRB->GetMaxGlobal().z && m_v3Max.z >= otherRB->GetMinGlobal().z))
 	{

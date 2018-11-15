@@ -36,79 +36,9 @@ void Application::InitVariables(void)
 			m_pEntityMngr->SetModelMatrix(m4Position);
 		}
 	}
-	//for (int i = 0; i < m_pEntityMngr->GetEntityCount(); ++i)
-	//{
-	//	m_pEntityMngr->GetEntity(i)->AddDimension(i);
-	//}
 	m_uOctantLevels = 2;
-	//for (int i = 0; i < m_pEntityMngr->GetEntityCount(); ++i)
-	//{
-	//	octant->IsColliding(i);
-	//}
 	octant->ConstructTree(8);
 	m_pEntityMngr->Update();
-}
-void Application::AssignDimensions()
-{
-	// create the test rigidbody that, if colliding with boxes, determine the dimension(s) it is in
-	//float dimensionSpaceLength = 34 / (m_uOctantLevels + 1);
-	//vector<vector3> testRbPoints;
-	//testRbPoints.push_back(vector3(-dimensionSpaceLength / 2, dimensionSpaceLength / 2, dimensionSpaceLength / 2));
-	//testRbPoints.push_back(vector3(dimensionSpaceLength / 2, dimensionSpaceLength / 2, dimensionSpaceLength / 2));
-	//testRbPoints.push_back(vector3(dimensionSpaceLength / 2, dimensionSpaceLength / 2, -dimensionSpaceLength / 2));
-	//testRbPoints.push_back(vector3(-dimensionSpaceLength / 2, dimensionSpaceLength / 2, -dimensionSpaceLength / 2));
-	//testRbPoints.push_back(vector3(dimensionSpaceLength / 2, -dimensionSpaceLength / 2, dimensionSpaceLength / 2));
-	//testRbPoints.push_back(vector3(-dimensionSpaceLength / 2, -dimensionSpaceLength / 2, dimensionSpaceLength / 2));
-	//testRbPoints.push_back(vector3(dimensionSpaceLength / 2, -dimensionSpaceLength / 2, -dimensionSpaceLength / 2));
-	//testRbPoints.push_back(vector3(-dimensionSpaceLength / 2, -dimensionSpaceLength / 2, -dimensionSpaceLength / 2));
-	//MyRigidBody testRb(testRbPoints);
-	//testRb.SetModelMatrix(glm::translate(vector3(-dimensionSpaceLength, -dimensionSpaceLength, -dimensionSpaceLength)));
-	//int dimCount = 0;
-	//for (int z = 0; z < pow(2, m_uOctantLevels); ++z)
-	//{
-	//	for (int y = 0; y < pow(2, m_uOctantLevels); ++y)
-	//	{
-	//		for (int x = 0; x < pow(2, m_uOctantLevels); ++x)
-	//		{
-	//			for (int i = 0; i < m_pEntityMngr->GetEntityCount(); ++i)
-	//			{
-	//				if (testRb.IsColliding(m_pEntityMngr->GetEntity(i)->GetRigidBody()))
-	//				{
-	//					m_pEntityMngr->GetEntity(i)->AddDimension(dimCount);
-	//				}
-	//			}
-	//			++dimCount;
-	//			testRb.SetModelMatrix(testRb.GetModelMatrix() * glm::translate(vector3(dimensionSpaceLength, 0, 0)));
-	//		}
-	//		testRb.SetModelMatrix(testRb.GetModelMatrix() * glm::translate(vector3(0, dimensionSpaceLength, 0)));
-	//	}
-	//	testRb.SetModelMatrix(testRb.GetModelMatrix() * glm::translate(vector3(0, 0, dimensionSpaceLength)));
-	//}
-	for (int i = 0; i < m_pEntityMngr->GetEntityCount(); ++i)
-	{
-		if (m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetCenterGlobal().x < 0)
-		{
-			if (m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetCenterGlobal().y < 0)
-			{
-				m_pEntityMngr->GetEntity(i)->AddDimension(0);
-			}
-			else
-			{
-				m_pEntityMngr->GetEntity(i)->AddDimension(1);
-			}
-		}
-		else
-		{
-			if (m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetCenterGlobal().y < 0)
-			{
-				m_pEntityMngr->GetEntity(i)->AddDimension(2);
-			}
-			else
-			{
-				m_pEntityMngr->GetEntity(i)->AddDimension(3);
-			}
-		}
-	}
 }
 void Application::Update(void)
 {
@@ -126,9 +56,19 @@ void Application::Update(void)
 
 	//Add objects to render list
 	m_pEntityMngr->AddEntityToRenderList(-1, true);
+	// disables and re-enables octree
+	static bool octTreeEnabled = true;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::BackSpace))
 	{
-		octant->ClearEntityList();
+		octTreeEnabled = !octTreeEnabled;
+		if (octTreeEnabled)
+		{
+			octant->ClearEntityList();
+		}
+		else
+		{
+			octant->ConstructTree(8);
+		}
 	}
 
 }
