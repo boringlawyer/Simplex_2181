@@ -35,7 +35,10 @@ Simplex::MyOctant::MyOctant(MyOctant const & other)
 
 Simplex::MyOctant::~MyOctant(void)
 {
-	KillBranches();
+	for (int i = 0; i < m_uChildren; ++i)
+	{
+		delete m_pChild[i];
+	}
 }
 
 uint Simplex::MyOctant::GetOctantCount(void)

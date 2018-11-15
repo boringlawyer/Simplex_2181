@@ -78,7 +78,15 @@ void Application::Display(void)
 	ClearScreen();
 
 	//display octree
-	octant->Display(C_YELLOW);
+	static bool displayOctTree = true;
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::V))
+	{
+		displayOctTree = !displayOctTree;
+	}
+	if (displayOctTree)
+	{
+		octant->Display(C_YELLOW);
+	}
 	//m_pRoot->Display();
 	
 	// draw a skybox
