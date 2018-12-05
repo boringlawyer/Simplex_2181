@@ -6,6 +6,7 @@ Date: 2017/06
 #define __MYRIGIDBODY_H_
 
 #include "Simplex\Mesh\Model.h"
+#include "Simplex\Simplex.h"
 
 namespace Simplex
 {
@@ -39,8 +40,8 @@ class MyRigidBody
 
 	matrix4 m_m4ToWorld = IDENTITY_M4; //Matrix that will take us from local to world coordinate
 
-	uint m_nCollidingCount = 0; //size of the colliding set
-	PRigidBody* m_CollidingArray = nullptr; //array of rigid bodies this one is colliding with
+	std::set<MyRigidBody*> m_CollidingRBSet; //set of rigid bodies this one is colliding with
+	vector3 v3Corner[8]; // container for the 8 corners of each model's bounding box
 
 public:
 	/*
@@ -230,12 +231,6 @@ public:
 	*/
 	void SetModelMatrix(matrix4 a_m4ModelMatrix);
 #pragma endregion
-	/*
-	USAGE: Checks if the input is in the colliding array
-	ARGUMENTS: MyRigidBody* a_pEntry -> Entry queried
-	OUTPUT: is it in the array?
-	*/
-	bool IsInCollidingArray(MyRigidBody* a_pEntry);
 	
 private:
 	/*
@@ -256,6 +251,15 @@ private:
 	OUTPUT: 0 for colliding, all other first axis that succeeds test
 	*/
 	uint SAT(MyRigidBody* const a_pOther);
+
+	/*
+	USAGE: Helper function that is used in the SAT function
+	ARGUMENTS: vector3 points[] -> list of point that makes up the first model, 
+			   vector3 otherPoints[] -> list of points that makes up the second model
+			   vector3 axis -> the axis that searates the two models
+	OUTPUT: true if the one model is projected to overlap with another, false if it is not
+	*/
+	bool ProjectionsOverlap(vector3 points[], vector3 otherPoints[], vector3 axis);
 };//class
 
 } //namespace Simplex

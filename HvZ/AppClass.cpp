@@ -1,5 +1,6 @@
 #include "AppClass.h"
-using namespace Simplex;
+#include "DynamicEntity.h"
+//using namespace Simplex;
 void Application::InitVariables(void)
 {
 	////Alberto needed this at this position for software recording.
@@ -30,6 +31,7 @@ void Application::InitVariables(void)
 	m_pModel1->AddGroup(pGroup1);
 	m_pModel1->AddGroup(pGroup2);
 	*/
+	
 #pragma endregion
 #pragma region Load Model and change its rendering properties
 	/*
@@ -74,18 +76,21 @@ void Application::InitVariables(void)
 #pragma endregion
 #pragma region Sandbox
 	//Background music
-	m_soundBGM.openFromFile(sRoute + "elementary-wave-11.ogg");
-	m_soundBGM.play();
-	m_soundBGM.setLoop(true);
+	//m_soundBGM.openFromFile(sRoute + "elementary-wave-11.ogg");
+	//m_soundBGM.play();
+	//m_soundBGM.setLoop(true);
 
 	//sound effect
-	m_soundBuffer.loadFromFile(sRoute + "12C.wav");
-	m_sound.setBuffer(m_soundBuffer);
+	/*m_soundBuffer.loadFromFile(sRoute + "12C.wav");
+	m_sound.setBuffer(m_soundBuffer);*/
 
 	//load model
-	m_pModel = new Simplex::Model();
-	m_pModel->Load("Lego\\Unikitty.BTO");
+	//m_pModel = new Simplex::Model();
+	//m_pModel->Load("Lego\\Unikitty.BTO");
 #pragma endregion
+	m_pEntityMngr = MyEntityManager::GetInstance();
+	m_pEntityMngr->AddEntity("Minecraft\\Creeper.obj", "Creeper");
+	m_pEntityMngr->SetModelMatrix(glm::translate(glm::vec3(0,0,0)));
 }
 void Application::Update(void)
 {
@@ -99,17 +104,18 @@ void Application::Update(void)
 	CameraRotation();
 
 	//Move light... just for fun...
-	static double dTimer = 0.0f; //create a variable to store time
-	static uint uClock = m_pSystem->GenClock(); //generate a clock to track time
-	dTimer += m_pSystem->GetDeltaTime(uClock); //get the time difference since last time called
-	double dAngle = MapValue(dTimer, 0.0, 5.0, 0.0, 360.0);//map the value so we do not need to wait 360 seconds, only 5
-	
-	static vector3 v3Color(C_WHITE); //color of the light
-	vector3 v3Position(glm::sin(glm::radians(dAngle)) * 5.0f, 2.5f, glm::cos(glm::radians(dAngle)) * 5.0f);//holds position of light
-	m_pLightMngr->SetPosition(v3Position, 1); //set the position of first light(0 is reserved for global light)
-	m_pLightMngr->SetIntensity(5.0f, 1); //set the intensity of first light
-	m_pLightMngr->SetColor(v3Color, 1); //set the color of first light
-	m_pMeshMngr->AddSphereToRenderList(glm::translate(v3Position) * glm::scale(vector3(0.15f)), v3Color, RENDER_SOLID); //add a sphere to "see" it
+	//static double dTimer = 0.0f; //create a variable to store time
+	//static uint uClock = m_pSystem->GenClock(); //generate a clock to track time
+	//dTimer += m_pSystem->GetDeltaTime(uClock); //get the time difference since last time called
+	//double dAngle = MapValue(dTimer, 0.0, 5.0, 0.0, 360.0);//map the value so we do not need to wait 360 seconds, only 5
+	//
+	//static vector3 v3Color(C_WHITE); //color of the light
+	//vector3 v3Position(glm::sin(glm::radians(dAngle)) * 5.0f, 2.5f, glm::cos(glm::radians(dAngle)) * 5.0f);//holds position of light
+	//m_pLightMngr->SetPosition(v3Position, 1); //set the position of first light(0 is reserved for global light)
+	//m_pLightMngr->SetIntensity(5.0f, 1); //set the intensity of first light
+	//m_pLightMngr->SetColor(v3Color, 1); //set the color of first light
+	//m_pMeshMngr->AddSphereToRenderList(glm::translate(v3Position) * glm::scale(vector3(0.15f)), v3Color, RENDER_SOLID); //add a sphere to "see" it
+	m_pEntityMngr->AddEntityToRenderList(-1, true);
 }
 void Application::Display(void)
 {
@@ -120,9 +126,9 @@ void Application::Display(void)
 	m_pMeshMngr->AddSkyboxToRenderList();
 	
 	// set the model matrix of the model
-	m_pModel->SetModelMatrix(ToMatrix4(m_qArcBall));
+	//m_pModel->SetModelMatrix(ToMatrix4(m_qArcBall));
 	//play the default sequence of the model
-	m_pModel->PlaySequence();
+	//m_pModel->PlaySequence();
 	
 	//render list call
 	m_uRenderCallCount = m_pMeshMngr->Render();

@@ -1,0 +1,28 @@
+#include "DynamicEntity.h"
+
+DynamicEntity::DynamicEntity(vector3 pos, vector3 vel, String a_sFileName, String a_sUniqueID = "NA") : MyEntity(a_sFileName, a_sUniqueID)
+{
+	position = pos;
+	velocity = vel;
+}
+//
+//MyEntity * DynamicEntity::GetEntity()
+//{
+//	return entity;
+//}
+//
+DynamicEntity::~DynamicEntity()
+{
+	delete this;
+}
+
+void DynamicEntity::ApplyForce(vector3 newForce)
+{
+	velocity += newForce;
+}
+
+void DynamicEntity::Update()
+{
+	position += velocity;
+	SetModelMatrix(glm::translate(position));
+}

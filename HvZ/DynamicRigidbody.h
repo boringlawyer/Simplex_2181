@@ -10,9 +10,13 @@ public:
 	void AddForce(vector3 newForce);
 	vector3 GetPosition();
 	vector3 GetVelocity();
+	void TrackHuman();
+	void MakeZombie();
 	void Update();
 private:
 	vector3 position;
 	vector3 velocity;
+	DynamicRigidbody* target;
+	bool isHuman;
 };
 
