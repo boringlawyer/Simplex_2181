@@ -89,8 +89,8 @@ void Application::InitVariables(void)
 	//m_pModel->Load("Lego\\Unikitty.BTO");
 #pragma endregion
 	m_pEntityMngr = MyEntityManager::GetInstance();
-	m_pEntityMngr->AddEntity("Minecraft\\Creeper.obj", "Creeper");
-	m_pEntityMngr->SetModelMatrix(glm::translate(glm::vec3(0,0,0)));
+	m_pEntityMngr->AddDynamicEntity(vector3(0,0,0), vector3(0,0,0), "Minecraft\\Creeper.obj", "Creeper");
+	m_pEntityMngr->SetModelMatrix(glm::translate(glm::vec3(0,0,0)), -1, true);
 }
 void Application::Update(void)
 {
@@ -116,6 +116,7 @@ void Application::Update(void)
 	//m_pLightMngr->SetColor(v3Color, 1); //set the color of first light
 	//m_pMeshMngr->AddSphereToRenderList(glm::translate(v3Position) * glm::scale(vector3(0.15f)), v3Color, RENDER_SOLID); //add a sphere to "see" it
 	m_pEntityMngr->AddEntityToRenderList(-1, true);
+	m_pEntityMngr->Update();
 }
 void Application::Display(void)
 {

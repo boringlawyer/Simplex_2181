@@ -6,7 +6,7 @@ Date: 2017/06
 #define __MYENTITYMANAGER_H_
 
 #include "MyEntity.h"
-
+#include "DynamicEntity.h"
 namespace Simplex
 {
 
@@ -14,8 +14,10 @@ namespace Simplex
 class MyEntityManager
 {
 	uint m_uEntityCount = 0; //number of elements in the list
+	uint m_uDynamicEntityCount = 0;
 	static MyEntityManager* m_pInstance; // Singleton pointer
 	std::vector<MyEntity*> m_entityList; //entities list
+	std::vector<DynamicEntity*> m_dynamicEntityList; //entities list
 public:
 	/*
 	Usage: Gets the singleton pointer
@@ -43,6 +45,7 @@ public:
 	OUTPUT: ---
 	*/
 	void AddEntity(String a_sFileName, String a_sUniqueID = "NA");
+	void AddDynamicEntity(vector3 pos, vector3 vel, String a_sFileName, String a_sUniqueID = "NA");
 	/*
 	USAGE: Deletes the Entity Specified by unique ID and removes it from the list
 	ARGUMENTS: uint a_uIndex -> index of the queried entry, if < 0 asks for the last one added
@@ -67,6 +70,7 @@ public:
 	OUTPUT: UniqueID of the entity, if the list is empty will return blank
 	*/
 	MyEntity* GetEntity(uint a_uIndex = -1);
+	DynamicEntity* GetDynamicEntity(uint a_uIndex = -1);
 	/*
 	USAGE: Will update the Entity manager
 	ARGUMENTS: ---
@@ -116,7 +120,7 @@ public:
 	-	uint a_uIndex = -1 -> index in the list of entities; if less than 0 it will add it to the last in the list
 	OUTPUT: ---
 	*/
-	void SetModelMatrix(matrix4 a_m4ToWorld, uint a_uIndex = -1);
+	void SetModelMatrix(matrix4 a_m4ToWorld, uint a_uIndex = -1, bool a_bSetDynamic = false);
 	/*
 	USAGE: Sets the model matrix associated to the entity specified in the ID
 	ARGUMENTS:

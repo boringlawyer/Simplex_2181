@@ -8,9 +8,9 @@ private:
 	vector3 velocity;
 	vector3 position;
 	DynamicRigidbody* rb;
-//public:
+	int uClock;
+public:
 	DynamicEntity(vector3 pos, vector3 vel, String a_sFileName, String a_sUniqueID = "NA");
-//	MyEntity* GetEntity();
 	~DynamicEntity();
 	void ApplyForce(vector3 newForce);
 	void Update();

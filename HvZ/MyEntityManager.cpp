@@ -138,21 +138,31 @@ void Simplex::MyEntityManager::SetModelMatrix(matrix4 a_m4ToWorld, String a_sUni
 		tempPtr->SetModelMatrix(a_m4ToWorld);
 	}
 }
-void Simplex::MyEntityManager::SetModelMatrix(matrix4 a_m4ToWorld, uint a_uIndex)
+void Simplex::MyEntityManager::SetModelMatrix(matrix4 a_m4ToWorld, uint a_uIndex, bool a_bSetDynamic)
 {
 	// If the entity list is empty, leave the method
-	if (m_entityList.size() == 0)
+	if (m_entityList.size() == 0 && m_dynamicEntityList.size() == 0)
 	{
 		return;
 	}
 
 	// Make sure you are in bounds
-	if (a_uIndex >= m_uEntityCount)
+	if (a_bSetDynamic)
 	{
-		a_uIndex = m_uEntityCount - 1;
+		if (a_uIndex >= m_uDynamicEntityCount)
+		{
+			a_uIndex = m_uDynamicEntityCount - 1;
+		}
+		m_dynamicEntityList[a_uIndex]->SetModelMatrix(a_m4ToWorld);
 	}
-
-	m_entityList[a_uIndex]->SetModelMatrix(a_m4ToWorld);
+	else
+	{
+		if (a_uIndex >= m_uEntityCount)
+		{
+			a_uIndex = m_uEntityCount - 1;
+		}
+		m_entityList[a_uIndex]->SetModelMatrix(a_m4ToWorld);
+	}	
 }
 //The big 3
 MyEntityManager::MyEntityManager(){Init();}
@@ -165,10 +175,18 @@ void Simplex::MyEntityManager::Update(void)
 	// Check for collisions here
 	for (uint i = 0; i < m_uEntityCount - 1; i++)
 	{
+		if (m_uEntityCount == 0)
+		{
+			break;
+		}
 		for (uint j = 0; j < m_uEntityCount; j++)
 		{
 			m_entityList[i]->IsColliding(m_entityList[j]);
 		}
+	}
+	for (int i = 0; i < m_uDynamicEntityCount; ++i)
+	{
+		m_dynamicEntityList[i]->Update();
 	}
 }
 void Simplex::MyEntityManager::AddEntity(String a_sFileName, String a_sUniqueID)
@@ -181,6 +199,15 @@ void Simplex::MyEntityManager::AddEntity(String a_sFileName, String a_sUniqueID)
 	{
 		m_entityList.push_back(tempPtr);
 		m_uEntityCount = m_entityList.size();
+	}
+}
+void Simplex::MyEntityManager::AddDynamicEntity(vector3 pos, vector3 vel, String a_sFileName, String a_sUniqueID)
+{
+	DynamicEntity* tempPtr = new DynamicEntity(pos, vel, a_sFileName, a_sUniqueID);
+	if (tempPtr)
+	{
+		m_dynamicEntityList.push_back(tempPtr);
+		m_uDynamicEntityCount = m_dynamicEntityList.size();
 	}
 }
 void Simplex::MyEntityManager::RemoveEntity(uint a_uIndex)
@@ -245,6 +272,21 @@ MyEntity* Simplex::MyEntityManager::GetEntity(uint a_uIndex)
 
 	return m_entityList[a_uIndex];
 }
+DynamicEntity * Simplex::MyEntityManager::GetDynamicEntity(uint a_uIndex)
+{
+	if (m_dynamicEntityList.size() == 0)
+	{
+		return nullptr;
+	}
+
+	// Make sure you are in bounds
+	if (a_uIndex >= m_dynamicEntityList.size())
+	{
+		a_uIndex = m_entityList.size();
+	}
+
+	return m_dynamicEntityList[a_uIndex];
+}
 void Simplex::MyEntityManager::AddEntityToRenderList(uint a_uIndex, bool a_bRigidBody)
 {
 	// If you are out of bounds, add all entities to the render list
@@ -253,6 +295,10 @@ void Simplex::MyEntityManager::AddEntityToRenderList(uint a_uIndex, bool a_bRigi
 		for (a_uIndex = 0; a_uIndex < m_uEntityCount; ++a_uIndex)
 		{
 			m_entityList[a_uIndex]->AddToRenderList(a_bRigidBody);
+		}
+		for (a_uIndex = 0; a_uIndex < m_uDynamicEntityCount; ++a_uIndex)
+		{
+			m_dynamicEntityList[a_uIndex]->AddToRenderList(a_bRigidBody);
 		}
 	}
 	// If you are in bounds, only the intended entity is rendered
