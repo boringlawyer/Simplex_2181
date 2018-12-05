@@ -1,7 +1,7 @@
 #include "MyOctant.h"
 using namespace Simplex;
 uint MyOctant::m_uOctantCount;
-uint MyOctant::m_uMaxLevel = 4;
+uint MyOctant::m_uMaxLevel = 70;
 uint MyOctant::m_uIdealEntityCount = 50;
 Simplex::MyOctant::MyOctant(uint a_nMaxLevel, uint a_nIdealEntityCount)
 {
@@ -35,6 +35,10 @@ Simplex::MyOctant::MyOctant(MyOctant const & other)
 
 Simplex::MyOctant::~MyOctant(void)
 {
+	for (int i = 0; i < m_uChildren; ++i)
+	{
+		delete m_pChild[i];
+	}
 }
 
 uint Simplex::MyOctant::GetOctantCount(void)
@@ -60,6 +64,10 @@ void Simplex::MyOctant::DisplayLeafs(vector3 a_v3Color)
 
 void Simplex::MyOctant::ClearEntityList(void)
 {
+	for (std::vector<uint>::iterator it = m_EntityList.begin(); it != m_EntityList.end(); ++it)
+	{
+		m_pEntityMngr->GetEntity(*it)->ClearDimensionSet();
+	}
 	m_EntityList.clear();
 	for (int i = 0; i < m_uChildren; ++i)
 	{
@@ -107,11 +115,20 @@ bool Simplex::MyOctant::ContainsMoreThan(uint a_nEntities)
 
 void Simplex::MyOctant::KillBranches(void)
 {
+	for (std::vector<uint>::iterator it = m_EntityList.begin(); it != m_EntityList.end(); ++it)
+	{
+		m_pEntityMngr->GetEntity(*it)->ClearDimensionSet();
+	}
+	for (int i = 0; i < m_uChildren; ++i)
+	{
+		m_pChild[i]->KillBranches();
+	}
 }
 
 void Simplex::MyOctant::ConstructTree(uint a_nMaxLevel)
 {
 	int numEntities = 0;
+	// for each entity, assign this octant's id to it if they are colliding and if this is a leaf
 	for (int i = 0; i < m_pEntityMngr->GetEntityCount(); ++i)
 	{
 		if (IsColliding(i))
@@ -121,6 +138,7 @@ void Simplex::MyOctant::ConstructTree(uint a_nMaxLevel)
 				m_pEntityMngr->GetEntity(i)->AddDimension(m_uID);
 			}
 			++numEntities;
+			// automatically subdivide if there are too many entities in here and if the max depth has not been reached
 			if (numEntities == m_uIdealEntityCount)
 			{
 				if (m_uLevel >= m_uMaxLevel)
@@ -171,6 +189,7 @@ vector3 Simplex::MyOctant::GetMaxGlobal(void)
 
 bool Simplex::MyOctant::IsColliding(uint a_uRBIndex)
 {
+	// does an old-school AABB on the rigidbody and the octant bounds
 	MyRigidBody* otherRB = m_pEntityMngr->GetEntity(a_uRBIndex)->GetRigidBody();
 	if ((m_v3Min.x <= otherRB->GetMaxGlobal().x && m_v3Max.x >= otherRB->GetMinGlobal().x) && (m_v3Min.y <= otherRB->GetMaxGlobal().y && m_v3Max.y >= otherRB->GetMinGlobal().y) && (m_v3Min.z <= otherRB->GetMaxGlobal().z && m_v3Max.z >= otherRB->GetMinGlobal().z))
 	{
