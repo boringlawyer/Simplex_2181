@@ -188,6 +188,27 @@ void Simplex::MyEntityManager::Update(void)
 	{
 		m_dynamicEntityList[i]->Update();
 	}
+	for (uint i = 0; i < m_uDynamicEntityCount - 1; i++)
+	{
+		if (m_uDynamicEntityCount == 0)
+		{
+			break;
+		}
+		for (uint j = 0; j < m_uDynamicEntityCount; j++)
+		{
+			if (m_dynamicEntityList[i]->IsColliding(m_dynamicEntityList[j]))
+			{
+				if (m_dynamicEntityList[i]->GetUniqueID() == m_dynamicEntityList[j]->GetUniqueID())
+				{
+					continue;
+				}
+				m_dynamicEntityList[i]->GetRigidBody()->SetColorColliding(C_RED);
+				m_dynamicEntityList[j]->GetRigidBody()->SetColorColliding(C_RED);
+				m_dynamicEntityList[i]->GetRigidBody()->SetColorNotColliding(C_WHITE);
+				m_dynamicEntityList[j]->GetRigidBody()->SetColorNotColliding(C_WHITE);
+			}
+		}
+	}
 }
 void Simplex::MyEntityManager::AddEntity(String a_sFileName, String a_sUniqueID)
 {
