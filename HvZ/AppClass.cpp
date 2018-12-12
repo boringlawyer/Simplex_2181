@@ -89,7 +89,12 @@ void Application::InitVariables(void)
 	//m_pModel->Load("Lego\\Unikitty.BTO");
 #pragma endregion
 	m_pEntityMngr = MyEntityManager::GetInstance();
-	m_pEntityMngr->AddDynamicEntity(vector3(0,0,0), vector3(0,0,0), "Minecraft\\Creeper.obj", "Creeper");
+	m_pEntityMngr->AddCreeper(vector3(6,0,0), vector3(0,0,0), "Minecraft\\Creeper.obj", "Creeper0");
+	m_pEntityMngr->AddCreeper(vector3(0,0,6), vector3(0,0,0), "Minecraft\\Creeper.obj", "Creeper1");
+	m_pEntityMngr->AddCreeper(vector3(0,0,-6), vector3(0,0,0), "Minecraft\\Creeper.obj", "Creeper2");
+	m_pEntityMngr->AddCreeper(vector3(-6,0,0), vector3(0,0,0), "Minecraft\\Creeper.obj", "Creeper3");
+	m_pEntityMngr->AddCreeper(vector3(6,0,-6), vector3(0,0,0), "Minecraft\\Creeper.obj", "Creeper4");
+	m_pEntityMngr->AddSteve(vector3(5, 0, 0), vector3(0), "Minecraft\\Steve.obj", "Steve");
 	m_pEntityMngr->SetModelMatrix(glm::translate(glm::vec3(0,0,0)), -1, true);
 }
 void Application::Update(void)

@@ -4,9 +4,9 @@ Date: 2017/06
 ----------------------------------------------*/
 #ifndef __MYENTITYMANAGER_H_
 #define __MYENTITYMANAGER_H_
-
-#include "MyEntity.h"
 #include "DynamicEntity.h"
+#include "Steve.h"
+#include "Creeper.h"
 namespace Simplex
 {
 
@@ -46,6 +46,8 @@ public:
 	*/
 	void AddEntity(String a_sFileName, String a_sUniqueID = "NA");
 	void AddDynamicEntity(vector3 pos, vector3 vel, String a_sFileName, String a_sUniqueID = "NA");
+	void AddSteve(vector3 pos, vector3 vel, String a_sFileName, String a_sUniqueID = "NA");
+	void AddCreeper(vector3 pos, vector3 vel, String a_sFileName, String a_sUniqueID = "NA");
 	/*
 	USAGE: Deletes the Entity Specified by unique ID and removes it from the list
 	ARGUMENTS: uint a_uIndex -> index of the queried entry, if < 0 asks for the last one added
@@ -71,6 +73,7 @@ public:
 	*/
 	MyEntity* GetEntity(uint a_uIndex = -1);
 	DynamicEntity* GetDynamicEntity(uint a_uIndex = -1);
+	DynamicEntity * GetDynamicEntity(String a_uId);
 	/*
 	USAGE: Will update the Entity manager
 	ARGUMENTS: ---

@@ -210,6 +210,25 @@ void Simplex::MyEntityManager::AddDynamicEntity(vector3 pos, vector3 vel, String
 		m_uDynamicEntityCount = m_dynamicEntityList.size();
 	}
 }
+void Simplex::MyEntityManager::AddSteve(vector3 pos, vector3 vel, String a_sFileName, String a_sUniqueID)
+{
+	Steve* temp = new Steve(pos, vel, a_sFileName, a_sUniqueID);
+	if (temp)
+	{
+		m_dynamicEntityList.push_back(temp);
+		m_uDynamicEntityCount = m_dynamicEntityList.size();
+	}
+}
+void Simplex::MyEntityManager::AddCreeper(vector3 pos, vector3 vel, String a_sFileName, String a_sUniqueID)
+{
+	Creeper* temp = new Creeper(pos, vel, a_sFileName, a_sUniqueID);
+	if (temp)
+	{
+		m_dynamicEntityList.push_back(temp);
+		m_uDynamicEntityCount = m_dynamicEntityList.size();
+	}
+
+}
 void Simplex::MyEntityManager::RemoveEntity(uint a_uIndex)
 {
 	// If the list is empty, there are no entities to remove
@@ -284,9 +303,25 @@ DynamicEntity * Simplex::MyEntityManager::GetDynamicEntity(uint a_uIndex)
 	{
 		a_uIndex = m_entityList.size();
 	}
-
 	return m_dynamicEntityList[a_uIndex];
 }
+DynamicEntity * Simplex::MyEntityManager::GetDynamicEntity(String a_uId)
+{
+	if (m_dynamicEntityList.size() == 0)
+	{
+		return nullptr;
+	}
+
+	for (int i = 0; i < m_dynamicEntityList.size(); ++i)
+	{
+		if (m_dynamicEntityList[i]->GetUniqueID() == a_uId)
+		{
+			return m_dynamicEntityList[i];
+		}
+	}
+	return nullptr;
+}
+
 void Simplex::MyEntityManager::AddEntityToRenderList(uint a_uIndex, bool a_bRigidBody)
 {
 	// If you are out of bounds, add all entities to the render list

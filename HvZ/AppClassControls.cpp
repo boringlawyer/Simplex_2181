@@ -428,23 +428,6 @@ void Application::ProcessKeyboard(void)
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
 		m_pCameraMngr->MoveVertical(m_fMovementSpeed * fMultiplier);
 #pragma endregion
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-	{
-		m_pEntityMngr->GetDynamicEntity(0)->ApplyForce(vector3(-1, 0, 0));
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-	{
-		m_pEntityMngr->GetDynamicEntity(0)->ApplyForce(vector3(1, 0, 0));
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-	{
-		m_pEntityMngr->GetDynamicEntity(0)->ApplyForce(vector3(0, 1, 0));
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-	{
-		m_pEntityMngr->GetDynamicEntity(0)->ApplyForce(vector3(0, -1, 0));
-	}
-
 }
 //Joystick
 void Application::ProcessJoystick(void)
