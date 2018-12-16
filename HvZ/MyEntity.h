@@ -15,8 +15,9 @@ class MyEntity
 {
 	bool m_bInMemory = false; //loaded flag
 	bool m_bSetAxis = false; //render axis flag
+protected:
 	String m_sUniqueID = ""; //Unique identifier name
-
+private:
 	Model* m_pModel = nullptr; //Model associated with this Entity
 	RigidBody* m_pRigidBody = nullptr; //Rigid Body associated with this Entity
 

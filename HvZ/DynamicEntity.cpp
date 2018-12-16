@@ -1,30 +1,52 @@
 #include "DynamicEntity.h"
-
-DynamicEntity::DynamicEntity(MyEntity * entityParam, vector3 pos, vector3 vel)
+#include "MyEntityManager.h"
+DynamicEntity::DynamicEntity(vector3 pos, vector3 vel, String a_sFileName, String a_sUniqueID) : MyEntity(a_sFileName, a_sUniqueID)
 {
-	entity = entityParam;
 	position = pos;
 	velocity = vel;
-	entity->SetModelMatrix(entity->GetModelMatrix() * glm::translate(position));
+	uClock = SystemSingleton::GetInstance()->GenClock();
 }
-
-MyEntity * DynamicEntity::GetEntity()
-{
-	return entity;
-}
-
+//
+//MyEntity * DynamicEntity::GetEntity()
+//{
+//	return entity;
+//}
+//
 DynamicEntity::~DynamicEntity()
 {
-	delete entity;
+	delete this;
 }
 
 void DynamicEntity::ApplyForce(vector3 newForce)
 {
-	velocity += newForce;
+	velocity += newForce *.05f/** SystemSingleton::GetInstance()->GetDeltaTime(uClock)*/;
+	//position += velocity * SystemSingleton::GetInstance()->GetDeltaTime(uClock);
+	//SetModelMatrix(glm::translate(position));
 }
 
 void DynamicEntity::Update()
 {
-	position += velocity;
-	entity->SetModelMatrix(glm::translate(position));
+	if (m_sUniqueID == "Creeper")
+	{
+		DynamicEntity* steve = MyEntityManager::GetInstance()->GetDynamicEntity("Steve");
+		if (steve != nullptr)
+		{
+			ApplyForce(steve->GetPosition() - position);
+		}
+	}
+	else if (m_sUniqueID == "Steve")
+	{
+	}
+	position += velocity * SystemSingleton::GetInstance()->GetDeltaTime(uClock);
+	SetModelMatrix(glm::translate(position));
+}
+
+vector3 DynamicEntity::GetPosition()
+{
+	return position;
+}
+
+vector3 DynamicEntity::GetVelocity()
+{
+	return velocity;
 }

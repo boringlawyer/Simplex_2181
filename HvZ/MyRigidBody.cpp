@@ -25,9 +25,6 @@ void MyRigidBody::Init(void)
 	m_v3ARBBSize = ZERO_V3;
 
 	m_m4ToWorld = IDENTITY_M4;
-
-	m_nCollidingCount = 0;
-	m_CollidingArray = nullptr;
 }
 void MyRigidBody::Swap(MyRigidBody& other)
 {
@@ -54,8 +51,7 @@ void MyRigidBody::Swap(MyRigidBody& other)
 
 	std::swap(m_m4ToWorld, other.m_m4ToWorld);
 
-	std::swap(m_nCollidingCount, other.m_nCollidingCount);
-	std::swap(m_CollidingArray, other.m_CollidingArray);
+	std::swap(m_CollidingRBSet, other.m_CollidingRBSet);
 }
 void MyRigidBody::Release(void)
 {
@@ -198,8 +194,7 @@ MyRigidBody::MyRigidBody(MyRigidBody const& other)
 
 	m_m4ToWorld = other.m_m4ToWorld;
 
-	m_nCollidingCount = other.m_nCollidingCount;
-	m_CollidingArray = other.m_CollidingArray;
+	m_CollidingRBSet = other.m_CollidingRBSet;
 }
 MyRigidBody& MyRigidBody::operator=(MyRigidBody const& other)
 {
@@ -214,88 +209,279 @@ MyRigidBody& MyRigidBody::operator=(MyRigidBody const& other)
 }
 MyRigidBody::~MyRigidBody() { Release(); };
 //--- other Methods
-void MyRigidBody::AddCollisionWith(MyRigidBody* other)
+void MyRigidBody::AddCollisionWith(MyRigidBody* a_pOther)
 {
-	//if its already in the list return
-	if (IsInCollidingArray(other))
-		return;
 	/*
 		check if the object is already in the colliding set, if
 		the object is already there return with no changes
 	*/
 
-	//insert the entry
-	PRigidBody* pTemp;
-	pTemp = new PRigidBody[m_nCollidingCount + 1];
-	if (m_CollidingArray)
-	{
-		memcpy(pTemp, m_CollidingArray, sizeof(MyRigidBody*) * m_nCollidingCount);
-		delete[] m_CollidingArray;
-		m_CollidingArray = nullptr;
-	}
-	pTemp[m_nCollidingCount] = other;
-	m_CollidingArray = pTemp;
-
-	++m_nCollidingCount;
-}
-void MyRigidBody::RemoveCollisionWith(MyRigidBody* other)
-{
-	//if there are no dimensions return
-	if (m_nCollidingCount == 0)
+	/*
+	check if the object is already in the colliding set, if
+	the object is already there return with no changes
+	*/
+	auto element = m_CollidingRBSet.find(a_pOther);
+	if (element != m_CollidingRBSet.end())
 		return;
-
-	//we look one by one if its the one wanted
-	for (uint i = 0; i < m_nCollidingCount; i++)
-	{
-		if (m_CollidingArray[i] == other)
-		{
-			//if it is, then we swap it with the last one and then we pop
-			std::swap(m_CollidingArray[i], m_CollidingArray[m_nCollidingCount - 1]);
-			PRigidBody* pTemp;
-			pTemp = new PRigidBody[m_nCollidingCount - 1];
-			if (m_CollidingArray)
-			{
-				memcpy(pTemp, m_CollidingArray, sizeof(uint) * (m_nCollidingCount - 1));
-				delete[] m_CollidingArray;
-				m_CollidingArray = nullptr;
-			}
-			m_CollidingArray = pTemp;
-
-			--m_nCollidingCount;
-			return;
-		}
-	}
+	// we couldn't find the object so add it
+	m_CollidingRBSet.insert(a_pOther);
+}
+void MyRigidBody::RemoveCollisionWith(MyRigidBody* a_pOther)
+{
+	m_CollidingRBSet.erase(a_pOther);
 }
 void MyRigidBody::ClearCollidingList(void)
 {
-	m_nCollidingCount = 0;
-	if (m_CollidingArray)
-	{
-		delete[] m_CollidingArray;
-		m_CollidingArray = nullptr;
-	}
+	m_CollidingRBSet.clear();
 }
 uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 {
-	/*
-	Your code goes here instead of this comment;
+	//Local min and maxs
+	vector3 minLocal = GetMinLocal();
+	vector3 minLocalAsGlobal = vector3(m_m4ToWorld * vector4(minLocal, 1.0f));
+	vector3 maxLocal = GetMaxLocal();
+	vector3 maxLocalAsGlobal = vector3(m_m4ToWorld * vector4(maxLocal, 1.0f));
 
-	For this method, if there is an axis that separates the two objects
-	then the return will be different than 0; 1 for any separating axis
-	is ok if you are not going for the extra credit, if you could not
-	find a separating axis you need to return 0, there is an enum in
-	Simplex that might help you [eSATResults] feel free to use it.
-	(eSATResults::SAT_NONE has a value of 0)
+	//vectro3[8] for the corners of the model
+	vector3* points = v3Corner;
+
+	vector3 otherMinLocal = a_pOther->GetMinLocal();
+	vector3 otherMinLocalAsGlobal = vector3(m_m4ToWorld * vector4(otherMinLocal, 1.0f));
+	vector3 otherMaxLocal = a_pOther->GetMaxLocal();
+	vector3 otherMaxLocalAsGlobal = vector3(m_m4ToWorld * vector4(otherMaxLocal, 1.0f));
+
+	//vector3[8] for the corners of the other model
+	vector3* otherPoints = a_pOther->v3Corner;
+
+	/*
+	*	AX check
 	*/
 
+	//Get the Ax axis
+	//points[1] holds the value with max x, min y and z
+	vector3 inLocalXDirection = points[1];
+	vector3 Ax = glm::normalize(inLocalXDirection - minLocalAsGlobal);
+	if (!ProjectionsOverlap(points, otherPoints, Ax)) {
+		return eSATResults::SAT_AX;
+	}
+
+	/*
+	*	AY check
+	*/
+
+	//Get the Ay axis
+	//points[2] holds the value with max y, min x and z
+	vector3 inLocalYDirection = points[2];
+	vector3 Ay = glm::normalize(inLocalYDirection - minLocalAsGlobal);
+	if (!ProjectionsOverlap(points, otherPoints, Ay)) {
+		return eSATResults::SAT_AY;
+	}
+
+	/*
+	*	AZ check
+	*/
+
+	//Get the Az axis
+	//points[4] holds the value with max z, min x and y
+	vector3 inLocalZDirection = points[4];
+	vector3 Az = glm::normalize(inLocalZDirection - minLocalAsGlobal);
+	if (!ProjectionsOverlap(points, otherPoints, Az)) {
+		return eSATResults::SAT_AZ;
+	}
+
+	/*
+	*	Bx check
+	*/
+
+	//Get the Bx Bxis
+	inLocalXDirection = otherPoints[1];
+	vector3 Bx = glm::normalize(inLocalXDirection - otherMinLocalAsGlobal);
+	if (!ProjectionsOverlap(points, otherPoints, Bx)) {
+		return eSATResults::SAT_BX;
+	}
+
+	/*
+	*	BY check
+	*/
+
+	//Get the By axis
+	inLocalYDirection = otherPoints[2];
+	vector3 By = glm::normalize(inLocalYDirection - otherMinLocalAsGlobal);
+	if (!ProjectionsOverlap(points, otherPoints, By)) {
+		return eSATResults::SAT_BY;
+	}
+
+	/*
+	*	BZ check
+	*/
+
+	//Get the Bz axis
+	inLocalZDirection = otherPoints[4];
+	vector3 Bz = glm::normalize(inLocalZDirection - otherMinLocalAsGlobal);
+	if (!ProjectionsOverlap(points, otherPoints, Bz)) {
+		return eSATResults::SAT_BZ;
+	}
+
+	/*
+	*	Ax x Bx check
+	*/
+
+	//Get the Ax x Bx axis
+	vector3 AxBx = glm::normalize(glm::cross(Ax, Bx));
+	if (!ProjectionsOverlap(points, otherPoints, AxBx)) {
+		return eSATResults::SAT_AXxBX;
+	}
+
+	//Get the Ax x By axis
+	vector3 AxBy = glm::normalize(glm::cross(Ax, By));
+	if (!ProjectionsOverlap(points, otherPoints, AxBy)) {
+		return eSATResults::SAT_AXxBY;
+	}
+
+	//Get the Ax x Bz axis
+	vector3 AxBz = glm::normalize(glm::cross(Ax, Bz));
+	if (!ProjectionsOverlap(points, otherPoints, AxBz)) {
+		return eSATResults::SAT_AXxBZ;
+	}
+
+	//Get the Ay x Bx axis
+	vector3 AyBx = glm::normalize(glm::cross(Ay, Bx));
+	if (!ProjectionsOverlap(points, otherPoints, AyBx)) {
+		return eSATResults::SAT_AYxBX;
+	}
+
+	//Get the Ay x By axis
+	vector3 AyBy = glm::normalize(glm::cross(Ay, By));
+	if (!ProjectionsOverlap(points, otherPoints, AyBy)) {
+		return eSATResults::SAT_AYxBY;
+	}
+
+	//Get the Ay x Bz axis
+	vector3 AyBz = glm::normalize(glm::cross(Ay, Bz));
+	if (!ProjectionsOverlap(points, otherPoints, AyBz)) {
+		return eSATResults::SAT_AYxBZ;
+	}
+
+	//Get the Az x Bx axis
+	vector3 AzBx = glm::normalize(glm::cross(Az, Bx));
+	if (!ProjectionsOverlap(points, otherPoints, AzBx)) {
+		return eSATResults::SAT_AZxBX;
+	}
+
+	//Get the Ax x By axis
+	vector3 AzBy = glm::normalize(glm::cross(Az, By));
+	if (!ProjectionsOverlap(points, otherPoints, AzBy)) {
+		return eSATResults::SAT_AZxBY;
+	}
+
+	//Get the Az x Bz axis
+	vector3 AzBz = glm::normalize(glm::cross(Az, Bz));
+	if (!ProjectionsOverlap(points, otherPoints, AzBz)) {
+		return eSATResults::SAT_AZxBZ;
+	}
+
 	//there is no axis test that separates this two objects
-	return 0;
+	return eSATResults::SAT_NONE;
 }
+
+bool MyRigidBody::ProjectionsOverlap(vector3 points[], vector3 otherPoints[], vector3 axis) {
+
+	//set min for both sets of points on the axis
+	//Assume the 1st point for both
+	vector3 min = points[0];
+	vector3 max = min;
+
+	vector3 otherMin = otherPoints[0];
+	vector3 otherMax = otherMin;
+
+	//Now loop through all the other points, find the real values
+	//Min means everything is in front of,
+	//Max means everything is behind
+	for (int i = 1; i < 8; i++) {
+
+		//Checking a new point in the first list
+		vector3 point = points[i];
+
+		//Is it behind the min?
+		vector3 differenceMin = point - min;
+		float dotMin = glm::dot(differenceMin, axis);
+		if (dotMin < 0) {
+			min = point;
+		}
+
+		//Is it in front of the max?
+		vector3 differenceMax = point - max;
+		float dotMax = glm::dot(differenceMax, axis);
+		if (dotMax > 0) {
+			max = point;
+		}
+
+		//Checking a new point in the other list
+		vector3 otherPoint = otherPoints[i];
+
+		//Is it behind the min?
+		vector3 otherDifferenceMin = otherPoint - otherMin;
+		float otherDotMin = glm::dot(otherDifferenceMin, axis);
+		if (otherDotMin < 0) {
+			otherMin = otherPoint;
+		}
+
+		//Is it in front of the max?
+		vector3 otherDifferenceMax = otherPoint - otherMax;
+		float otherDotMax = glm::dot(otherDifferenceMax, axis);
+		if (otherDotMax > 0) {
+			otherMax = otherPoint;
+		}
+	}
+
+	//Now we hav both min and maxs
+	//We need either both other points to be in front of both points or 
+	//bot other points to be behind both points
+
+	//Start by checking otherMax
+	vector3 differenceOtherMaxToMax = otherMax - max;
+	float dotOtherMaxToMax = glm::dot(differenceOtherMaxToMax, axis);
+
+	vector3 differenceOtherMaxToMin = otherMax - min;
+	float dotOtherMaxToMin = glm::dot(differenceOtherMaxToMin, axis);
+
+	bool otherMaxesInFront = false;
+	if (dotOtherMaxToMax > 0 && dotOtherMaxToMin > 0) {
+		otherMaxesInFront = true;
+	}
+	else if (dotOtherMaxToMax < 0 && dotOtherMaxToMin < 0) {
+		otherMaxesInFront = false;
+	}
+	else {
+		return true;
+	}
+
+	//Now lets look at the other min
+	vector3 differenceOtherMinToMax = otherMin - max;
+	float dotOtherMinToMax = glm::dot(differenceOtherMinToMax, axis);
+
+	vector3 differenceOtherMinToMin = otherMin - min;
+	float dotOtherMinToMin = glm::dot(differenceOtherMinToMin, axis);
+
+	bool otherMinsInFront = false;
+	if (dotOtherMinToMax > 0 && dotOtherMinToMin > 0) {
+		otherMinsInFront = true;
+	}
+	else if (dotOtherMinToMax < 0 && dotOtherMinToMin < 0) {
+		otherMinsInFront = false;
+	}
+	else {
+		return true;
+	}
+
+	//If they're differnet, collision still happened!
+	return (otherMaxesInFront != otherMinsInFront);
+}
+
 bool MyRigidBody::IsColliding(MyRigidBody* const a_pOther)
 {
 	//check if spheres are colliding
-	bool bColliding = true;
-	//bColliding = (glm::distance(GetCenterGlobal(), other->GetCenterGlobal()) < m_fRadius + other->m_fRadius);
+	bool bColliding = (glm::distance(GetCenterGlobal(), a_pOther->GetCenterGlobal()) < m_fRadius + a_pOther->m_fRadius);
 	//if they are check the Axis Aligned Bounding Box
 	if (bColliding) //they are colliding with bounding sphere
 	{
@@ -313,6 +499,12 @@ bool MyRigidBody::IsColliding(MyRigidBody* const a_pOther)
 			bColliding = false;
 		if (this->m_v3MinG.z > a_pOther->m_v3MaxG.z) //this in front of other
 			bColliding = false;
+		// Finally, use SAT to get the most accurate collision detection
+		if (bColliding)
+		{
+			if (SAT(a_pOther) != eSATResults::SAT_NONE)
+				bColliding = false;// reset to false
+		}
 
 		if (bColliding) //they are colliding with bounding box also
 		{
@@ -337,12 +529,12 @@ void MyRigidBody::AddToRenderList(void)
 {
 	if (m_bVisibleBS)
 	{
-		if (m_nCollidingCount > 0)
+		if (m_CollidingRBSet.size() > 0)
 			m_pMeshMngr->AddWireSphereToRenderList(glm::translate(m_m4ToWorld, m_v3CenterL) * glm::scale(vector3(m_fRadius)), C_BLUE_CORNFLOWER);
 		else
 			m_pMeshMngr->AddWireSphereToRenderList(glm::translate(m_m4ToWorld, m_v3CenterL) * glm::scale(vector3(m_fRadius)), C_BLUE_CORNFLOWER);
 	}
-	if (m_bVisibleOBB)
+	/*if (m_bVisibleOBB)
 	{
 		if (m_nCollidingCount > 0)
 			m_pMeshMngr->AddWireCubeToRenderList(glm::translate(m_m4ToWorld, m_v3CenterL) * glm::scale(m_v3HalfWidth * 2.0f), m_v3ColorColliding);
@@ -355,15 +547,5 @@ void MyRigidBody::AddToRenderList(void)
 			m_pMeshMngr->AddWireCubeToRenderList(glm::translate(m_v3CenterG) * glm::scale(m_v3ARBBSize), C_YELLOW);
 		else
 			m_pMeshMngr->AddWireCubeToRenderList(glm::translate(m_v3CenterG) * glm::scale(m_v3ARBBSize), C_YELLOW);
-	}
-}
-bool MyRigidBody::IsInCollidingArray(MyRigidBody* a_pEntry)
-{
-	//see if the entry is in the set
-	for (uint i = 0; i < m_nCollidingCount; i++)
-	{
-		if (m_CollidingArray[i] == a_pEntry)
-			return true;
-	}
-	return false;
+	}*/
 }

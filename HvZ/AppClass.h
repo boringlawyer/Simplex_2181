@@ -6,6 +6,7 @@ Date: 2017/06
 #define __APPLICATIONCLASS_H_
 
 #include "Definitions.h"
+#include "MyEntityManager.h"
 
 #include "ControllerConfiguration.h"
 #include "imgui\ImGuiObject.h"
@@ -17,6 +18,7 @@ class Application
 {
 	Simplex::Model* m_pModel = nullptr; //Model to try
 private:
+	Simplex::MyEntityManager* m_pEntityMngr;
 	static ImGuiObject gui; //GUI object
 	bool m_bGUI_Main = true; //show Main GUI window?
 	bool m_bGUI_Console = true; //show Credits GUI window?
